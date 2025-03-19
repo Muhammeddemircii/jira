@@ -61,7 +61,7 @@ function AddStaff({ setOpenAddStaff, setLoadingStaffButton, onStaffAdded }) {
           availableUserTypes = [
             { value: 2, text: "Departman Yöneticisi" },
             { value: 3, text: "Personel" },
-            { value: 4, text: "Grup Yöneticisi" }
+            { value: 4, text: "Grup Yöneticisi" },
           ];
           break;
         case "2":

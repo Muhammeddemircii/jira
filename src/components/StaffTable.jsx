@@ -189,6 +189,39 @@ function StaffTable({ refreshTrigger = 0 }) {
     handleMenuClose();
   };
 
+  const handlePasswordReset = (staff) => {
+    if (!staff || !staff.email) {
+      console.error("Şifre sıfırlanacak personel verisi geçersiz:", staff);
+      dispatch(setError("Personel verisi geçersiz"));
+      return;
+    }
+    
+    handleMenuClose();
+    
+    console.log("Şifre sıfırlama işlemi başlatılıyor - Personel:", staff.name);
+    
+    // Loading state set
+    dispatch(setLoading(true));
+    
+    staffService.resetPassword(staff.email)
+      .then((response) => {
+        // Başarılı mesaj göster
+        console.log("Şifre sıfırlama maili gönderildi:", response);
+        alert("Şifre sıfırlama maili LED Asistan tarafından gönderildi.");
+      })
+      .catch(error => {
+        console.error("Şifre sıfırlama hatası:", error);
+        // Hata detaylarını göster
+        const errorMessage = error.response?.data?.message || 
+                           error.response?.data?.errors?.join(', ') || 
+                           "Şifre sıfırlama işlemi sırasında bir hata oluştu.";
+        alert(errorMessage);
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+  };
+
   const handleDelete = (staff) => {
     const exitReason = 'deneme';
     const userId = staff.id;
@@ -362,7 +395,7 @@ function StaffTable({ refreshTrigger = 0 }) {
         >
           <MenuItem onClick={() => handleEdit(selectedStaff)}>Düzenle</MenuItem>
           <MenuItem onClick={() => handleDelete(selectedStaff)}>Sil</MenuItem>
-          <MenuItem onClick={() => navigate('/changePassword')}>Şifre Sıfırla</MenuItem>
+          <MenuItem onClick={() => handlePasswordReset(selectedStaff)}>Şifre Sıfırla</MenuItem>
         </Menu>
 
         {loading && page > 1 && (

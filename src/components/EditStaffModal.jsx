@@ -19,7 +19,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { setEditModalOpen, updateStaffInList } from '../store/slices/staffSlice';
-import { staffService, departmentService } from '../axios/axios';
+import { staffService, departmentService, roleService } from '../axios/axios';
+import api from '../axios/axios';
 
 function EditStaffModal() {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ function EditStaffModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [departments, setDepartments] = useState([]);
+  const [roles, setRoles] = useState([]);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -36,19 +38,57 @@ function EditStaffModal() {
     birthDate: '',
     tc: '',
     departmentId: '',
+    roleId: '',
   });
 
   useEffect(() => {
-    const fetchDepartments = async () => {
+    const fetchData = async () => {
       try {
-        const response = await departmentService.getDepartments();
-        setDepartments(response);
+        setLoading(true);
+        console.log("Departman ve rol verileri yükleniyor...");
+        
+        // Departmanları ve rolleri ayrı ayrı çekelim, bir hata diğerini etkilemesin
+        try {
+          const departmentsResponse = await departmentService.getDepartments();
+          console.log("Departman verileri başarıyla yüklendi:", departmentsResponse);
+          setDepartments(departmentsResponse || []);
+        } catch (deptError) {
+          console.error("Departman verileri yüklenirken hata:", deptError);
+          setDepartments([]);
+        }
+        
+        try {
+          console.log("roleService.getRoles() fonksiyonu çağrılıyor...");
+          // Alternatif endpoint denemesi
+          const response = await api.get("/api/v1/Role");
+          console.log("API'den gelen rol yanıtı (raw):", response);
+          
+          let rolesData = [];
+          
+          if (response && response.data) {
+            if (Array.isArray(response.data)) {
+              rolesData = response.data;
+            } else if (response.data.data && Array.isArray(response.data.data)) {
+              rolesData = response.data.data;
+            }
+          }
+          
+          console.log("İşlenmiş rol verisi:", rolesData);
+          setRoles(rolesData);
+        } catch (roleError) {
+          console.error("Rol verileri yüklenirken hata:", roleError);
+          setRoles([]);
+        }
+        
       } catch (error) {
-        console.error("Departman verileri alınırken hata oluştu:", error);
+        console.error("Veri yüklenirken genel hata:", error);
+        // Hata mesajını görüntüle ancak modalın çalışmasına engel olma
+      } finally {
+        setLoading(false);
       }
     };
     
-    fetchDepartments();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -71,6 +111,7 @@ function EditStaffModal() {
             departmentId: editingStaff.userDepartmentsResponse && 
                           editingStaff.userDepartmentsResponse.length > 0 ? 
                           editingStaff.userDepartmentsResponse[0].departmentId : '',
+            roleId: editingStaff.roleId || '',
           });
           
           // API'den detaylı veri çekmeyi dene, başarısız olursa üstteki veri kullanılacak
@@ -90,6 +131,7 @@ function EditStaffModal() {
                 departmentId: staffDetails.userDepartmentsResponse && 
                               staffDetails.userDepartmentsResponse.length > 0 ? 
                               staffDetails.userDepartmentsResponse[0].departmentId : prev.departmentId,
+                roleId: staffDetails.roleId || prev.roleId,
               }));
             }
           } catch (apiError) {
@@ -136,7 +178,8 @@ function EditStaffModal() {
         birthDate: formData.birthDate || null,
         phoneNumber: formData.phoneNumber || "",
         tc: formData.tc || "",
-        departmentId: formData.departmentId || ""
+        departmentId: formData.departmentId || "",
+        roleId: formData.roleId || ""
       };
       
       console.log("Güncellenecek personel verisi:", staffData);
@@ -148,6 +191,7 @@ function EditStaffModal() {
       const updatedStaff = {
         ...editingStaff,
         ...formData,
+        roleName: getRoleName(formData.roleId),
         userDepartmentsResponse: formData.departmentId ? [
           {
             departmentId: formData.departmentId,
@@ -155,6 +199,15 @@ function EditStaffModal() {
           }
         ] : []
       };
+      
+      function getRoleName(roleId) {
+        if (!roleId) return editingStaff.roleName || '';
+        
+        const role = roles.find(r => r.id === roleId);
+        if (!role) return editingStaff.roleName || '';
+        
+        return role.roleName || role.name || editingStaff.roleName || '';
+      }
       
       dispatch(updateStaffInList(updatedStaff));
       console.log("Redux store güncellendi");
@@ -322,6 +375,31 @@ function EditStaffModal() {
                       {dept.name}
                     </MenuItem>
                   ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="role-label">Görev/Rol</InputLabel>
+                <Select
+                  labelId="role-label"
+                  id="roleId"
+                  name="roleId"
+                  value={formData.roleId}
+                  onChange={handleChange}
+                  label="Görev/Rol"
+                >
+                  <MenuItem value="">Seçiniz</MenuItem>
+                  {roles && roles.length > 0 ? (
+                    roles.map((role, index) => (
+                      <MenuItem key={role.id || `role-${index}`} value={role.id || ''}>
+                        {role.roleName || role.name || `Rol ${index + 1}`}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>Rol bulunamadı</MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </Grid>

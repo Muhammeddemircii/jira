@@ -55,11 +55,22 @@ export const loginService = {
 export const departmentService = {
   getDepartments: async () => {
     try {
+      console.log("Departmanlar için API isteği yapılıyor...");
       const response = await api.get("/api/v1/Department/GetByTenant?tenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      return response.data.data;
+      console.log("Departmanlar API yanıtı:", response.data);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Departmanlar API yanıtı geçersiz format:", response.data);
+        return [];
+      }
     } catch (error) {
       console.error("Departman verileri alınırken hata oluştu:", error);
-      throw error;
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      // Hata durumunda boş dizi döndür, bu sayede uygulama çökmez
+      return [];
     }
   },
 
@@ -176,15 +187,25 @@ export const tasksServices = {
 export const roleService = {
   getRoles: async () => {
     try {
-      const response = await api.get("/api/v1/User/GetByTenantId?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      return response.data.data;
+      console.log("Roller için API isteği yapılıyor...");
+      const response = await api.get("/api/v1/Role/GetByTenantId?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+      console.log("Roles API yanıtı:", response.data);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Roles API yanıtı geçersiz format:", response.data);
+        return [];
+      }
     } catch (error) {
-      console.error("role alınırken hata oluştu", error);
-      throw error;
+      console.error("Roller alınırken hata oluştu:", error);
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      // Hata durumunda boş dizi döndür, bu sayede uygulama çökmez
+      return [];
     }
   },
   
-
   getPagedRoles: async (endpoint) => {
     try {
       const response = await api.get(endpoint);
@@ -223,7 +244,8 @@ export const staffService = {
         birthDate: staffData.birthDate || null,
         phoneNumber: staffData.phoneNumber || "",
         tc: staffData.tc || "",
-        departmentIdList: staffData.departmentId ? [staffData.departmentId] : []
+        departmentIdList: staffData.departmentId ? [staffData.departmentId] : [],
+        roleId: staffData.roleId || ""
       };
 
       console.log("API'ye gönderilen personel verisi:", updatedData);
@@ -306,6 +328,33 @@ export const staffService = {
       };
     } catch (error) {
       console.error("Personel listesi alınırken hata oluştu:", error);
+      throw error;
+    }
+  },
+  
+  resetPassword: async (email) => {
+    try {
+      console.log(`Şifre sıfırlama isteği gönderiliyor - Email: ${email}`);
+      
+      // Swagger dökümana göre doğru endpoint ve format
+      const response = await api.get(`/api/v1/User/ResetPassword`, {
+        params: { 
+          Email: email 
+        }
+      });
+      
+      console.log("Şifre sıfırlama isteği gönderildi:", response.data);
+      return {
+        success: true,
+        message: "Şifre sıfırlama maili gönderildi"
+      };
+    } catch (error) {
+      console.error("Şifre sıfırlama maili gönderilirken hata oluştu:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+        console.error("API hata mesajı:", error.response.statusText);
+      }
       throw error;
     }
   }
