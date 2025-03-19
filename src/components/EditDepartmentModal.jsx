@@ -14,6 +14,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import '../styles/DepartmentPage.css';
+import { toast } from 'react-hot-toast';
 
 function EditDepartmentModal() {
     const dispatch = useDispatch();
@@ -47,25 +48,55 @@ function EditDepartmentModal() {
 
         setIsSubmitting(true);
         try {
+            console.log("Güncelleme için gönderilecek veri:", {
+                departmentId: editingDepartment.id,
+                name: departmentName
+            });
+            
+            // API'nin beklediği formatta veri gönder
+            const result = await departmentService.updateDepartment(
+                editingDepartment.id, 
+                { name: departmentName }
+            );
+
+            console.log("Güncelleme sonucu:", result);
+
+            // UI'da değişikliği göster
             const updatedDepartment = {
                 ...editingDepartment,
                 name: departmentName,
                 description: description
             };
-
-            const result = await departmentService.updateDepartment(
-                editingDepartment.id, 
-                updatedDepartment
-            );
-
-            // Update the department in the redux store
+            
+            // Redux store'u güncelle
             const updatedDepartments = departments.map(dept => 
                 dept.id === editingDepartment.id ? updatedDepartment : dept
             );
             
             dispatch(setDepartments(updatedDepartments));
+            toast.success(`${departmentName} başarıyla güncellendi.`);
+            
+            // Veri gerçekten güncellenmiş mi kontrol et
+            setTimeout(async () => {
+                try {
+                    const refreshedData = await departmentService.getDepartments();
+                    if (Array.isArray(refreshedData)) {
+                        const updatedDept = refreshedData.find(dept => dept.id === editingDepartment.id);
+                        if (updatedDept && updatedDept.name === departmentName) {
+                            console.log("Departman gerçekten güncellendi:", updatedDept);
+                        } else {
+                            console.warn("Departman UI'da güncellendi ama API'de değişiklik görünmüyor");
+                        }
+                        dispatch(setDepartments(refreshedData));
+                    }
+                } catch (refreshError) {
+                    console.error("Veri yenilenirken hata:", refreshError);
+                }
+            }, 800);
+            
             handleClose();
         } catch (err) {
+            console.error("Güncelleme hatası:", err);
             setError(err.response?.data?.message || 'Departman güncellenirken bir hata oluştu.');
         } finally {
             setIsSubmitting(false);

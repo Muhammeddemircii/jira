@@ -65,17 +65,29 @@ export const departmentService = {
 
   updateDepartment: async (departmentId, departmentData) => {
     try {
-      const response = await api.put(`/api/v1/Department/`, {
-        ...departmentData,
+      console.log("Departman güncelleme başlatılıyor, gönderilen veri:", {
+        departmentId,
+        name: departmentData.name,
+        tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      });
+      
+      const response = await api.put(`/api/v1/Department`, {
+        departmentId: departmentId, // API'ye uygun parametre ismi
+        name: departmentData.name,
         tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
       }, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      return response.data.data;
+      console.log("Güncelleme yanıtı:", response.data);
+      return response.data;
     } catch (error) {
       console.error("Departman güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
       throw error;
     }
   },
