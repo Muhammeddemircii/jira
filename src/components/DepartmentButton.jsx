@@ -1,49 +1,57 @@
-import { Button } from '@mui/material'
-import React, { useState } from 'react'
-import DepartmentTable from './DepartmentTable'
+import React, { useState } from 'react';
+import { Button, Typography, useMediaQuery } from '@mui/material';
+import DepartmentTable from './DepartmentTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import EditDepartmentModal from './EditDepartmentModal';
+import AddDepartment from './AddDepartment';
 
 function DepartmentButton() {
-    const [LoadingStaffButton, setLoadingStaffButton] = useState(false);
-    const [openAddStaff, setOpenAddStaff] = useState(false);
-    const handleAddStaff = () => {
-        setLoadingStaffButton(true);
-        setOpenAddStaff(true);
+    const [loadingDepartmentButton, setLoadingDepartmentButton] = useState(false);
+    const [openAddDepartment, setOpenAddDepartment] = useState(false);
+    const isMobile = useMediaQuery('(max-width:768px)');
+    
+    const handleAddDepartment = () => {
+        setLoadingDepartmentButton(true);
+        setOpenAddDepartment(true);
 
         setTimeout(() => {
-            setLoadingStaffButton(false);
+            setLoadingDepartmentButton(false);
         }, 1000);
     };
 
     return (
         <div>
-            <div>
+            <div className="department-header">
+                <Typography variant="h1">{isMobile ? "Departmanlar" : "Departman Yönetimi"}</Typography>
                 <Button
-                    onClick={handleAddStaff}
+                    onClick={handleAddDepartment}
                     variant="contained"
-                    disabled={LoadingStaffButton}
-                    sx={{ backgroundColor: "#20b494" }}
+                    disabled={loadingDepartmentButton}
+                    className="department-add-button"
+                    size={isMobile ? "small" : "medium"}
                 >
                     <FontAwesomeIcon
                         className="icon-margin"
-                        icon={LoadingStaffButton ? faSpinner : faPlus}
-                        spin={LoadingStaffButton}
+                        icon={loadingDepartmentButton ? faSpinner : faPlus}
+                        spin={loadingDepartmentButton}
+                        style={{ marginRight: '8px' }}
                     />
-                    {LoadingStaffButton ? " Ekleniyor..." : " Departman Ekle"}
-                </Button> 
-                <DepartmentTable />
-
-                {openAddStaff && (
-                    <div>
-                        <EditDepartmentModal/>
-                    </div>
-                )}
+                    {loadingDepartmentButton ? "Ekleniyor..." : isMobile ? "Ekle" : "Departman Ekle"}
+                </Button>
             </div>
+            
+            <DepartmentTable />
 
+            {openAddDepartment && (
+                <AddDepartment
+                    onClose={() => setOpenAddDepartment(false)}
+                />
+            )}
+            
+            <EditDepartmentModal />
         </div>
-    )
+    );
 }
 
-export default DepartmentButton
+export default DepartmentButton;

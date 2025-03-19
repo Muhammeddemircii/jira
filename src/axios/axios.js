@@ -95,6 +95,26 @@ export const departmentService = {
       console.error("Departman eklenirken hata oluştu:", error);
       throw error;
     }
+  },
+  
+  deleteDepartment: async (departmentId) => {
+    try {
+      console.log(`Silme işlemi başlatılıyor. Department ID: ${departmentId}`);
+      
+      // İçeriği URL'in bir parçası olarak gönder, params kullanma
+      const response = await api.delete(`/api/v1/Department?DepartmentId=${departmentId}`);
+      
+      console.log("Silme başarılı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Departman silme işlemi sırasında hata oluştu:", error);
+      if (error.response) {
+        console.log("API Yanıtı:", error.response);
+        console.log("API yanıt verisi:", error.response.data);
+        console.log("API yanıt durum kodu:", error.response.status);
+      }
+      throw error;
+    }
   }
 };
 
@@ -196,10 +216,12 @@ export const staffService = {
       const response = await api.delete(`/api/v1/User`, {
         params: {
           UserId: id,
-          ExitReason: exitReason
+          ExitReason: exitReason,
+          tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
         }
       });
       console.log("Silme başarılı:", response.data);
+      return response.data;
     } catch (error) {
       console.error("Silme işlemi sırasında hata oluştu:", error);
       if (error.response) {

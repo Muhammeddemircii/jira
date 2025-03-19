@@ -1,0 +1,355 @@
+.department-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 64px);
+  width: calc(100% - 70px);
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.department-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.department-header h1 {
+  color: #333;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.department-add-button {
+  background-color: #20b494 !important;
+  color: white !important;
+  border-radius: 8px !important;
+  padding: 6px 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  white-space: nowrap;
+  min-width: 130px;
+  box-shadow: 0 2px 5px rgba(32, 180, 148, 0.3) !important;
+}
+
+.department-add-button:hover {
+  background-color: #18a085 !important;
+  box-shadow: 0 4px 8px rgba(32, 180, 148, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* Table Styles */
+.department-table-container {
+  background-color: white;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  overflow-x: auto;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.department-table-title {
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  font-weight: 600 !important;
+  color: #333;
+  font-size: 16px !important;
+}
+
+.department-table-row {
+  transition: background-color 0.2s ease;
+}
+
+.department-table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.department-table-name {
+  font-weight: 500 !important;
+  color: #333;
+  font-size: 14px !important;
+}
+
+.department-table-description {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* İşlem butonları için stil */
+.action-buttons-cell {
+  white-space: nowrap;
+  min-width: 120px !important;
+  padding: 0 16px !important;
+}
+
+.department-table-edit-button {
+  color: #20b494 !important;
+  margin-right: 2px !important;
+  padding: 6px !important;
+  background-color: rgba(32, 180, 148, 0.1) !important;
+}
+
+.department-table-edit-button:hover {
+  background-color: rgba(32, 180, 148, 0.2) !important;
+}
+
+.department-table-delete-button {
+  color: #e74c3c !important;
+  margin-right: 2px !important;
+  padding: 6px !important;
+  background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+.department-table-delete-button:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+.department-table-profile-button {
+  color: #3498db !important;
+  padding: 6px !important;
+  background-color: rgba(52, 152, 219, 0.1) !important;
+}
+
+.department-table-profile-button:hover {
+  background-color: rgba(52, 152, 219, 0.2) !important;
+}
+
+/* Temel elemanlar için stil */
+.MuiTableCell-root {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600 !important;
+  color: #555;
+  background-color: #f8f9fa;
+}
+
+.department-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.department-loading-spinner {
+  margin-bottom: 16px !important;
+  color: #20b494 !important;
+}
+
+.department-error {
+  padding: 20px;
+  text-align: center;
+  background-color: #fee;
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+/* Mobil görünüm için stil */
+@media (max-width: 768px) {
+  .department-container {
+    padding: 16px 12px;
+    width: calc(100% - 40px);
+  }
+  
+  .department-header h1 {
+    font-size: 18px;
+  }
+  
+  .department-add-button {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    min-width: 100px;
+  }
+  
+  .MuiTableCell-root {
+    padding: 8px 12px !important;
+  }
+  
+  .department-table-title {
+    padding: 12px 16px;
+  }
+}
+
+/* Department Form Styles */
+.department-form-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.department-form-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.department-form-field {
+  margin-bottom: 20px !important;
+}
+
+.department-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.department-form-cancel {
+  color: #555 !important;
+}
+
+.department-form-submit {
+  background-color: #20b494 !important;
+  color: white !important;
+}
+
+.department-form-submit:hover {
+  background-color: #18a085 !important;
+}
+
+/* Department Modal */
+.department-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.department-modal-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 500px;
+  outline: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.department-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.department-modal-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+
+.department-modal-close {
+  color: #777;
+}
+
+/* Empty state */
+.department-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.department-empty-icon {
+  font-size: 52px;
+  color: #ddd;
+  margin-bottom: 16px;
+}
+
+.department-empty-text {
+  color: #777;
+  font-size: 15px;
+  max-width: 400px;
+}
+
+/* Card Styles (keeping for reference) */
+.department-card {
+  background-color: white;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+}
+
+.department-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.department-card-header {
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.department-card-content {
+  padding: 20px !important;
+}
+
+.department-card-title {
+  font-weight: 600 !important;
+  font-size: 18px !important;
+  color: #333;
+  margin-bottom: 6px !important;
+}
+
+.department-card-count {
+  color: #666;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.department-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px !important;
+  background-color: #f8f9fa;
+  border-top: 1px solid #eee;
+}
+
+.department-edit-button {
+  color: #20b494 !important;
+  margin-right: 8px !important;
+}
+
+.department-delete-button {
+  color: #e74c3c !important;
+}
+
+.department-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.page-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow-x: hidden;
+} 

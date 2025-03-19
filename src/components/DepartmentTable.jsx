@@ -6,11 +6,27 @@ import { MdDeleteForever } from "react-icons/md";
 import { ImProfile } from "react-icons/im";
 import { setDepartments, setError, setLoading, setEditingDepartment, setEditModalOpen } from '../store/slices/departmanSlice';
 import EditDepartmentModal from './EditDepartmentModal';
-import '../styles/DepartmentTable.css';
+import { 
+    Paper, 
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableContainer, 
+    TableHead, 
+    TableRow, 
+    Typography, 
+    IconButton, 
+    Box,
+    CircularProgress,
+    Tooltip
+} from '@mui/material';
+import { FaUsers } from 'react-icons/fa';
+import '../styles/DepartmentPage.css';
+import { toast } from 'react-hot-toast';
 
 function DepartmentTable() {
     const dispatch = useDispatch();
-    const { departments, error } = useSelector(state => state.departments);
+    const { departments, error, loading } = useSelector(state => state.departments);
 
     useEffect(() => {
         const fetchDepartman = async () => {
@@ -38,53 +54,174 @@ function DepartmentTable() {
         dispatch(setEditModalOpen(true));
     };
 
-    return (
-        <div className='departments'>
-            <div className='department-table'>
-                <p>Departmanlar ({departments.length})</p>
-                <hr />
-                <table style={{ width: '100%', height: '290px', borderCollapse: "collapse" }}>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Departman adı</th>
-                            <th>İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {departments && departments.length > 0 ? (
-                            departments.slice().reverse().map((dept, index) => {
-                                if (!dept || !dept.name) { 
-                                    return null;
-                                }
-                                return (
-                                    <tr key={dept.id} style={{ borderBottom: "1px solid #e0e0e0" }}>
-                                        <td>{index + 1}</td>
-                                        <td>{dept.name}</td>
-                                        <td>
-                                            <span className='icon-container-edit' onClick={() => handleEdit(dept)}>
-                                                <FaRegEdit />
-                                            </span>
-                                            <span className='icon-container-delete'>
-                                                <MdDeleteForever />
-                                            </span>
-                                            <span className='icon-container-profile'>
-                                                <ImProfile />
-                                            </span>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan="3">Departman bulunamadı.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+    const handleDelete = async (departmentId, departmentName) => {
+        if (window.confirm(`"${departmentName}" departmanını silmek istediğinize emin misiniz?`)) {
+            try {
+                dispatch(setLoading(true));
+                console.log(`Silme işlemi başlıyor: ${departmentName} (ID: ${departmentId})`);
+                
+                // Silme işlemini gerçekleştir
+                const result = await departmentService.deleteDepartment(departmentId);
+                console.log("Silme işlemi sonucu:", result);
+                
+                // UI'dan kaldır
+                const updatedDepartments = departments.filter(dept => dept.id !== departmentId);
+                dispatch(setDepartments(updatedDepartments));
+                
+                toast.success(`"${departmentName}" departmanı başarıyla silindi.`);
+                
+                // Verinin gerçekten silindiğinden emin olmak için API'den güncel listeyi yeniden çek
+                setTimeout(async () => {
+                    try {
+                        const refreshedData = await departmentService.getDepartments();
+                        console.log("Güncel departman listesi:", refreshedData);
+                        
+                        if (Array.isArray(refreshedData)) {
+                            // Silinen departman hala listede mi kontrol et
+                            const stillExists = refreshedData.some(dept => dept.id === departmentId);
+                            
+                            if (stillExists) {
+                                console.warn(`Departman ID ${departmentId} hala veritabanında mevcut.`);
+                                toast.warning("Silme işlemi UI'da başarılı göründü ancak sunucudan doğrulama bekleniyor.");
+                            } else {
+                                console.log("Silme işlemi sunucu tarafında da doğrulandı.");
+                            }
+                            
+                            // Listeyi güncelle
+                            dispatch(setDepartments(refreshedData));
+                        }
+                    } catch (refreshError) {
+                        console.error("Veri yenilenirken hata:", refreshError);
+                    }
+                }, 800);
+                
+            } catch (error) {
+                console.error("Departman silme hatası:", error);
+                
+                let errorMessage = "Departman silinirken bir hata oluştu.";
+                if (error.response) {
+                    console.error("API yanıt kodu:", error.response.status);
+                    console.error("API hata detayları:", error.response.data);
+                    
+                    if (error.response.data && error.response.data.message) {
+                        errorMessage = error.response.data.message;
+                    } else if (error.response.status === 404) {
+                        errorMessage = "Silinecek departman bulunamadı. Sayfa yenilendikten sonra tekrar deneyin.";
+                    } else if (error.response.status === 403) {
+                        errorMessage = "Bu işlem için yetkiniz bulunmuyor.";
+                    } else if (error.response.status === 401) {
+                        errorMessage = "Oturum süresi dolmuş olabilir. Lütfen yeniden giriş yapın.";
+                    }
+                }
+                
+                toast.error(errorMessage);
+            } finally {
+                dispatch(setLoading(false));
+            }
+        }
+    };
+
+    const handleViewDetails = (department) => {
+        console.log("View details for department:", department);
+        // Add view details logic here
+    };
+
+    if (loading) {
+        return (
+            <Box className="department-loading-container">
+                <CircularProgress size={40} className="department-loading-spinner" />
+                <Typography>Departmanlar yükleniyor...</Typography>
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box className="department-error">
+                <Typography color="error">{error}</Typography>
+            </Box>
+        );
+    }
+
+    if (!departments || departments.length === 0) {
+        return (
+            <div className="department-empty-state">
+                <div className="department-empty-icon">
+                    <FaUsers />
+                </div>
+                <Typography className="department-empty-text">
+                    Henüz hiç departman eklenmemiş. "Departman Ekle" butonunu kullanarak yeni bir departman ekleyebilirsiniz.
+                </Typography>
             </div>
-            <EditDepartmentModal />
-        </div>
+        );
+    }
+
+    return (
+        <Paper className="department-table-container">
+            <Typography variant="h6" className="department-table-title">
+                Departmanlar ({departments.length})
+            </Typography>
+            
+            <TableContainer>
+                <Table stickyHeader size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell width="8%">#</TableCell>
+                            <TableCell width="67%">Departman Adı</TableCell>
+                            <TableCell width="25%" align="right">İşlemler</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {departments.slice().reverse().map((dept, index) => (
+                            <TableRow key={dept.id} className="department-table-row">
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>
+                                    <Typography className="department-table-name">
+                                        {dept.name}
+                                    </Typography>
+                                    {dept.description && (
+                                        <Typography variant="body2" color="text.secondary" className="department-table-description">
+                                            {dept.description}
+                                        </Typography>
+                                    )}
+                                </TableCell>
+                                <TableCell align="right" className="action-buttons-cell">
+                                    <Tooltip title="Düzenle">
+                                        <IconButton 
+                                            className="department-table-edit-button" 
+                                            onClick={() => handleEdit(dept)}
+                                            size="small"
+                                        >
+                                            <FaRegEdit />
+                                        </IconButton>
+                                    </Tooltip>
+                                    
+                                    <Tooltip title="Sil">
+                                        <IconButton 
+                                            className="department-table-delete-button" 
+                                            onClick={() => handleDelete(dept.id, dept.name)}
+                                            size="small"
+                                        >
+                                            <MdDeleteForever />
+                                        </IconButton>
+                                    </Tooltip>
+                                    
+                                    <Tooltip title="Detaylar">
+                                        <IconButton 
+                                            className="department-table-profile-button" 
+                                            onClick={() => handleViewDetails(dept)}
+                                            size="small"
+                                        >
+                                            <ImProfile />
+                                        </IconButton>
+                                    </Tooltip>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
     );
 }
 
