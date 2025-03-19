@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import '../styles/StaffTable.css';
 import { departmentService, roleService, staffService } from '../axios/axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setStaffList, setEditModalOpen, setEditingStaff, setLoading, setError } from '../store/slices/staffSlice';
 import { 
   FormControl, 
   MenuItem, 
@@ -22,51 +24,56 @@ import { useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PersonIcon from '@mui/icons-material/Person';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import EditStaffModal from './EditStaffModal';
 
 function StaffTable({ refreshTrigger = 0 }) {
-  const [staffList, setStaffList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { staffList, loading, error } = useSelector(state => state.staff);
   const [departman, setDepartman] = useState('');
   const [departmanListesi, setDepartmanListesi] = useState([]);
-
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef();
   const lastStaffElementRef = useRef();
   const initialFetchDone = useRef(false);
-
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
 
   const fetchStaff = useCallback(async (pageNumber, departmentId = '', shouldAppend = false) => {
     try {
-      setLoading(true);
+      dispatch(setLoading(true));
       let endpoint = `api/v1/User/GetPaged?PageNumber=${pageNumber}&TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3&PageSize=${pageSize}`;
       if (departmentId) {
         endpoint += `&DepartmentId=${departmentId}`;
       }
 
-      const response = await roleService.getPagedRoles(endpoint);
-      const data = response.data;
-      const totalPages = response.totalPages || 1;
+      const response = await staffService.getPagedStaff(endpoint);
+      console.log("API response:", response);
+      
+      if (response && response.data) {
+        const data = response.data;
+        const totalPages = response.totalPages || 1;
 
-      if (shouldAppend) {
-        setStaffList(prevList => [...prevList, ...data]);
+        if (shouldAppend && Array.isArray(staffList)) {
+          dispatch(setStaffList([...staffList, ...data]));
+        } else {
+          dispatch(setStaffList(data));
+        }
+
+        setHasMore(pageNumber < totalPages);
       } else {
-        setStaffList(data);
+        dispatch(setError('API yanıtı geçersiz format içeriyor'));
+        console.error("Geçersiz API yanıtı:", response);
       }
-
-      setHasMore(pageNumber < totalPages);
     } catch (err) {
-      setError('Personel verileri yüklenirken hata oluştu.');
-      console.error(err);
+      dispatch(setError('Personel verileri yüklenirken hata oluştu.'));
+      console.error("Fetch staff error:", err);
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
-  }, [pageSize]);
+  }, [pageSize, dispatch, staffList]);
 
   useEffect(() => {
     const fetchDepartman = async () => {
@@ -74,16 +81,15 @@ function StaffTable({ refreshTrigger = 0 }) {
         const response = await departmentService.getDepartments();
         setDepartmanListesi(response);
       } catch (err) {
-        setError('Departman verileri yüklenirken hata oluştu.');
+        dispatch(setError('Departman verileri yüklenirken hata oluştu.'));
       }
     };
     fetchDepartman();
-  }, []);
+  }, [dispatch]);
 
-  // Effect to handle the refresh trigger from parent
   useEffect(() => {
     if (refreshTrigger > 0) {
-      initialFetchDone.current = false; // Reset the fetch flag
+      initialFetchDone.current = false;
       setPage(1);
       fetchStaff(1, departman, false);
     }
@@ -93,11 +99,16 @@ function StaffTable({ refreshTrigger = 0 }) {
     if (!initialFetchDone.current) {
       fetchStaff(1, departman, false);
       initialFetchDone.current = true;
-    } else {
+    } else if (departman) {
       setPage(1);
       fetchStaff(1, departman, false);
     }
   }, [departman, fetchStaff]);
+
+  // Initial data load
+  useEffect(() => {
+    fetchStaff(1, '', false);
+  }, []);
 
   const loadMoreStaff = useCallback(() => {
     if (!loading && hasMore) {
@@ -141,9 +152,14 @@ function StaffTable({ refreshTrigger = 0 }) {
   };
 
   const deduplicatedStaff = useMemo(() => {
+    if (!staffList || !Array.isArray(staffList)) {
+      console.log("Staff list is not an array:", staffList);
+      return [];
+    }
+    
     const uniqueIds = new Set();
     return staffList.filter(staff => {
-      if (uniqueIds.has(staff.id)) {
+      if (!staff || !staff.id || uniqueIds.has(staff.id)) {
         return false;
       }
       uniqueIds.add(staff.id);
@@ -161,11 +177,22 @@ function StaffTable({ refreshTrigger = 0 }) {
     setSelectedStaff(null);
   };
 
+  const handleEdit = (staff) => {
+    console.log("Düzenlenecek personel:", staff);
+    if (!staff || !staff.id) {
+      console.error("Düzenlenecek personel verisi geçersiz:", staff);
+      dispatch(setError("Personel verisi geçersiz"));
+      return;
+    }
+    dispatch(setEditingStaff(staff));
+    dispatch(setEditModalOpen(true));
+    handleMenuClose();
+  };
+
   const handleDelete = (staff) => {
     const exitReason = 'deneme';
     const userId = staff.id;
     
-    // Close the menu first
     handleMenuClose();
     
     console.log("Silinecek ID:", userId);
@@ -173,12 +200,16 @@ function StaffTable({ refreshTrigger = 0 }) {
     staffService.deleteUser(userId, exitReason)
       .then(() => {
         console.log("Personel başarıyla silindi.");
-        setStaffList(prevList => prevList.filter(item => item.id !== userId));
+        dispatch(setStaffList(staffList.filter(item => item.id !== userId)));
       })
       .catch(error => {
         console.error("Silme işlemi başarısız:", error);
       });
   };
+
+  useEffect(() => {
+    console.log("Staff List:", staffList);
+  }, [staffList]);
 
   return ( 
     <div className="staffs">
@@ -232,7 +263,15 @@ function StaffTable({ refreshTrigger = 0 }) {
           </Box>
         )}
 
-        {(deduplicatedStaff.length > 0) && !error && (
+        {!loading && deduplicatedStaff.length === 0 && (
+          <Box sx={{ padding: '30px', textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              Görüntülenecek personel bulunamadı.
+            </Typography>
+          </Box>
+        )}
+
+        {(deduplicatedStaff.length > 0) && (
           <div className="table-responsive">
             <table>
               <thead>
@@ -321,6 +360,7 @@ function StaffTable({ refreshTrigger = 0 }) {
             horizontal: 'right',
           }}
         >
+          <MenuItem onClick={() => handleEdit(selectedStaff)}>Düzenle</MenuItem>
           <MenuItem onClick={() => handleDelete(selectedStaff)}>Sil</MenuItem>
           <MenuItem onClick={() => navigate('/changePassword')}>Şifre Sıfırla</MenuItem>
         </Menu>
@@ -332,6 +372,7 @@ function StaffTable({ refreshTrigger = 0 }) {
           </Box>
         )}
       </Paper>
+      <EditStaffModal />
     </div>
   );
 }

@@ -214,11 +214,28 @@ export const staffService = {
   
   updateStaff: async (id, staffData) => {
     try {
-      const updatedData = { ...staffData, id };
+      const updatedData = {
+        userId: id,
+        name: staffData.name,
+        email: staffData.email,
+        tenantId: staffData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3",
+        bloodType: staffData.bloodType || "",
+        birthDate: staffData.birthDate || null,
+        phoneNumber: staffData.phoneNumber || "",
+        tc: staffData.tc || "",
+        departmentIdList: staffData.departmentId ? [staffData.departmentId] : []
+      };
+
+      console.log("API'ye gönderilen personel verisi:", updatedData);
+      
       const response = await api.put("/api/v1/User", updatedData);
       return response.data;
     } catch (error) {
       console.error("Personel güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("API yanıt hatası:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
       throw error;
     }
   },
@@ -239,6 +256,56 @@ export const staffService = {
       if (error.response) {
         console.log("API Yanıtı:", error.response);
       }
+      throw error;
+    }
+  },
+
+  getStaffById: async (id) => {
+    try {
+      console.log(`getStaffById fonksiyonu çağrıldı - ID: ${id}`);
+      
+      if (!id) {
+        console.error("getStaffById için ID parametresi geçersiz:", id);
+        throw new Error("Geçersiz kullanıcı ID'si");
+      }
+      
+      // Endpoint yapısı değişimi
+      const response = await api.get(`/api/v1/User/GetById`, {
+        params: { 
+          UserId: id,
+          TenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+        }
+      });
+      
+      console.log("getStaffById yanıtı:", response);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("API yanıtı beklenen formatta değil:", response.data);
+        throw new Error("API yanıt formatı geçersiz");
+      }
+    } catch (error) {
+      console.error("Personel detayları alınırken hata oluştu:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+  
+  getPagedStaff: async (endpoint) => {
+    try {
+      const response = await api.get(endpoint);
+      return {
+        data: response.data.data,
+        totalPages: response.data.totalPages,
+        totalCount: response.data.totalCount,
+        currentPage: response.data.currentPage
+      };
+    } catch (error) {
+      console.error("Personel listesi alınırken hata oluştu:", error);
       throw error;
     }
   }
