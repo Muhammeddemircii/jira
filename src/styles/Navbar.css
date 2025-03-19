@@ -1,0 +1,91 @@
+.navbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.navbar-toggle {
+  cursor: pointer;
+  width: 35px;
+  height: 35px;
+  transition: left 0.3s ease-in-out;
+}
+.navbar-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 170px;
+  height: 100vh;
+  background: linear-gradient(to top, #98acb4, #A7CBB8);
+  padding: 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
+  
+}
+
+
+.tenant-name{
+  font-weight: bolder;
+  font-size: x-large;
+  color: #2C3E50
+}
+
+.name{
+  font-weight: bolder;
+  font-size: medium;
+  color: #34495E;
+}
+.role-name{
+  font-size: smaller;
+  color: #314353;
+}
+
+.navbar-toogle-fontawesomeicon {
+  background-color: #20b494;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  width: 20px;
+  height: 15px;
+}
+.icon-pano-container{
+  background-color: transparent;
+  width: 100%;
+  height: 30px;
+  text-align: left;
+
+
+}
+.icon-pano-container * {
+  display: inline-block;
+  margin-left: 12px;
+  height: 100%;
+
+}
+
+.navbar-panel{
+  margin-top: 10px;
+}
+
+.welcome-info {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.welcome-info.show {
+  opacity: 1;
+  font-size: 14px;
+  color: darkgray;
+  font-weight: bold;
+}
+
+
+
+
+@keyframes blink {
+  50% {
+    border-color: #20b494;
+  }
+}

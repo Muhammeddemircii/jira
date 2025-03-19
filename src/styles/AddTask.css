@@ -1,0 +1,64 @@
+.add-task {
+    background-color:rgb(243,243,244);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 25px;
+    width: 70vh;
+    height: 80vh;
+}
+
+.add-task>* {
+    width: 90%;
+    height: 20%;
+    padding: 25px 0 0 0;
+}
+.task-buttons{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.task-buttons > * { 
+    height: 50px;
+}
+@keyframes slideDown {
+    0% {
+        transform: translate(-50%, -150%); 
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translate(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100%); 
+        opacity: 0;
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.add-task.scroll-up {
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+.add-task.scroll-down {
+    animation: slideOut 0.5s ease-out forwards;
+}

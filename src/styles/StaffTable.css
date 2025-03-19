@@ -1,0 +1,148 @@
+.staffs {
+    width: 96%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.staff-table {
+    background-color: white;
+    margin: 25px 0 0 0;
+    width: 100%;
+}
+
+.staff-table>p{
+    padding: 15px;
+}
+
+.department{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 0 0 20px 15px;
+
+}
+.department>:nth-child(1){
+    transform: translateY(-2px);
+}
+
+.table {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.table table td:nth-child(2){
+    width: 150px;
+}
+.table table td:nth-child(3){
+    width: 420px;
+}
+.table table td:nth-child(4),
+.table table td:nth-child(5),
+.table table td:nth-child(6),
+.table table td:nth-child(7) {
+  padding-right: 20px;
+  padding-left: 20px; 
+  width: 100px;
+  text-align: center;
+}
+.table table td:nth-child(8),
+.table table td:nth-child(9){
+    padding-right: 20px;
+    padding-left: 20px; 
+}
+  
+.table tbody tr:hover{
+    background-color: lightgray;
+    transition: background-color 0.5s ease; 
+}
+
+tbody{
+    border-top: 2px solid lightgray;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+    max-height: 650px;
+    overflow-y: auto;
+}
+
+.table-responsive table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-responsive table th {
+    background-color: #f5f7fa;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table-responsive table td {
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    color: #444;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.table-responsive tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table-responsive tbody tr:hover {
+    background-color: rgba(32, 180, 148, 0.04);
+}
+
+/* Customize scrollbar for modern browsers */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #20b494;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .table-responsive {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .staffs {
+        width: 98%;
+    }
+}
+
+/* Animation for loading */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.table-responsive tbody tr {
+    animation: fadeIn 0.3s ease-in-out;
+}

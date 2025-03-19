@@ -1,0 +1,106 @@
+.staff {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-out;
+}
+
+.add-staff {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideDown 0.4s ease-out;
+}
+
+.staff-header {
+    text-align: center;
+}
+
+.staff-header svg:not(.fa-times) {
+    font-size: 50px;
+    color: #20b494;
+    margin-bottom: 10px;
+}
+
+.staff-body {
+    border-top: 1px solid #eee;
+}
+
+/* Scrollbar styling for the modal */
+.add-staff::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.add-staff::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.add-staff::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.add-staff::-webkit-scrollbar-thumb:hover {
+    background: #20b494;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+.staff.scroll-up {
+    animation: slideUp 0.4s ease-out forwards;
+}
+
+.staff.scroll-down {
+    animation: slideOut 0.4s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .add-staff {
+        width: 95%;
+        max-width: none;
+        max-height: 95vh;
+    }
+}
+  
