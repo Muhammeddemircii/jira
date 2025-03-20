@@ -154,6 +154,7 @@ hr {
 
 .icon-pano-container.active {
   background: rgba(255, 255, 255, 0.12);
+  transform: translateX(10px);
 }
 
 .icon-pano-container.active::before {
@@ -208,6 +209,38 @@ hr {
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.05);
   position: relative;
+  overflow: hidden;
+}
+
+.icon-dropdown-container::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #20b494;
+  transition: all 0.3s ease;
+}
+
+.icon-dropdown-container.active {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(10px);
+  padding-left: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.icon-dropdown-container.active::before {
+  left: 0;
+}
+
+.icon-dropdown-container.active svg {
+  color: #b42094;
+}
+
+.icon-dropdown-container.active h5 {
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .chevron-icon {
@@ -239,6 +272,29 @@ hr {
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #20b494;
+  transition: all 0.3s ease;
+}
+
+.dropdown-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateX(10px);
+}
+
+.dropdown-item.active::before {
+  left: 0;
 }
 
 .dropdown-item:hover {
@@ -263,8 +319,8 @@ hr {
 
 @media (max-width: 768px) {
   .navbar-nav {
-    width: 220px;
-    padding-top: 60px;
+    width: 240px;
+    padding: 60px 15px 20px;
   }
   
   .icon-pano-container, .icon-dropdown-container {
@@ -272,7 +328,7 @@ hr {
   }
   
   .icon-pano-container svg, .icon-dropdown-container svg {
-    font-size: 1rem;
+    margin-right: 10px;
   }
   
   .icon-pano-container h5, .icon-dropdown-container h5 {
@@ -280,7 +336,7 @@ hr {
   }
   
   .navbar-toggle.open {
-    left: 235px;
+    left: 255px;
   }
 }
 

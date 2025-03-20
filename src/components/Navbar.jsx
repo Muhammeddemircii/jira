@@ -46,7 +46,6 @@ function Navbar({ setIsOpen, isOpen }) {
     }, []);
 
     useEffect(() => {
-
         const path = location.pathname;
         if (path.includes("/HomePage")) {
             setActivePage("home");
@@ -54,6 +53,8 @@ function Navbar({ setIsOpen, isOpen }) {
             setActivePage("staff");
         } else if (path.includes("/DepartmentPage")) {
             setActivePage("department");
+        } else if (path.includes("/ProfilePage")) {
+            setActivePage("profile");
         }
     }, [location]);
 
@@ -86,7 +87,9 @@ function Navbar({ setIsOpen, isOpen }) {
     }
 
     const handleProfile = () => {
-        navigate("/ProfilePage")
+        navigate("/ProfilePage");
+        setActivePage("profile");
+        if (window.innerWidth < 768) setIsOpen(false);
     }
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
@@ -258,7 +261,7 @@ function Navbar({ setIsOpen, isOpen }) {
                         </motion.div>
                     )}
                 </AnimatePresence>
-                
+
                 <motion.div 
                     custom={5} 
                     variants={navItemsVariants}
@@ -281,7 +284,7 @@ function Navbar({ setIsOpen, isOpen }) {
                             exit="hidden"
                             className="dropdown-content"
                         >
-                            <motion.div variants={dropdownItemVariants} className="dropdown-item" onClick={handleProfile}>
+                            <motion.div variants={dropdownItemVariants} className={`dropdown-item ${activePage === "profile" ? "active" : ""}`} onClick={handleProfile}>
                                 Profilim
                             </motion.div>
                             <motion.div variants={dropdownItemVariants} className="dropdown-item">
@@ -293,17 +296,6 @@ function Navbar({ setIsOpen, isOpen }) {
                         </motion.div>
                     )}
                 </AnimatePresence>
-                
-                <motion.div 
-                    custom={6} 
-                    variants={navItemsVariants}
-                    initial="hidden"
-                    animate={isOpen ? "visible" : "hidden"}
-                    className="icon-pano-container"
-                >
-                    <FontAwesomeIcon icon={faBell} />
-                    <h5>Bildirim ayarları</h5>
-                </motion.div>
                 
                 <motion.div
                     custom={7}
