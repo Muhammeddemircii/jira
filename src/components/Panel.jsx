@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, Modal } from '@mui/material';
 import '../styles/Panel.css';
 import AddTask from '../components/Tasks/AddTask';
+import { tasksServices } from '../axios/axios';
+
 function Panel({ setTasks }) {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -11,11 +13,30 @@ function Panel({ setTasks }) {
         setOpen(true);
     };
 
-    const handleSaveAddTask = (newTask) => {
-        setTasks((prevTasks) => [...prevTasks, newTask]);
+    const handleSaveAddTask = async (newTask) => {
+        console.log("Yeni eklenen görev detayları:", newTask);
+        
+        try {
+            // Yeni görev eklendiğinde tüm görev listesini yeniden yükle
+            const updatedTasks = await tasksServices.getTasks();
+            console.log("Güncel görev listesi:", updatedTasks);
+            
+            // State'i güncelle
+            setTasks(updatedTasks);
+            
+            // Kullanıcıya başarılı işlem mesajı
+            console.log("Görev listesi başarıyla güncellendi");
+        } catch (error) {
+            console.error("Görev listesi güncellenirken hata:", error);
+        }
+        
         setLoading(false);
-
         setOpen(false);
+        
+        // Sayfayı 1 saniye sonra yenile (en son çare olarak)
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     };
 
     return (
@@ -37,7 +58,6 @@ function Panel({ setTasks }) {
                 >
                     <div className={`panel-task ${open ? "open" : "close"}`}>
                         <AddTask
-
                             setOpen={setOpen}
                             setLoading={setLoading}
                             handleSave={handleSaveAddTask}

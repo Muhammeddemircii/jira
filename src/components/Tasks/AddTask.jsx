@@ -41,37 +41,110 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
   const handleSaveTask = async () => {
     setAnimationTaskClass("scroll-down")
 
-    if (!name) {
+    if (!name || name.trim() === "") {
       alert("Görev adı boş olamaz!");
       return;
     }
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("departmentId", departman);
-    formData.append("priority", oncelik);
-    formData.append("status", status);
-    formData.append("createUserId", createUserId);
-    formData.append("createUserTentantId", createUserTentantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-
-    console.log("Gönderilen FormData:");
-    for (const pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
+    
     try {
-      const response = await tasksServices.createTask(formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      setLoading(true);
+      
+      // İsim alanını özel karakterlerden arındır ve temizle
+      // - Tüm whitespace karakterlerini tek bir boşluğa dönüştür
+      // - Başta ve sonda boşlukları kaldır
+      // - ASCII olmayan karakterleri kaldır veya değiştir
+      let cleanName = name
+        .trim()                            // Baştaki ve sondaki boşlukları kaldır
+        .replace(/\s+/g, " ")              // Birden fazla boşluğu tek boşluğa indir
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, ""); // Kontrol karakterlerini kaldır
+        
+      // İsim hala boş değilse devam et
+      if (!cleanName || cleanName.trim().length === 0) {
+        alert("Geçerli bir görev adı girmelisiniz!");
+        setLoading(false);
+        return;
+      }
+      
+      // İsmin minimum 2 karakter olduğundan emin ol
+      if (cleanName.length < 2) {
+        alert("Görev adı en az 2 karakter olmalıdır!");
+        setLoading(false);
+        return;
+      }
+      
+      console.log("Orijinal isim:", name);
+      console.log("Temizlenmiş isim:", cleanName);
+      console.log("İsim uzunluğu:", cleanName.length);
 
-      handleSave(response.data.data);
-      setOpen(false);
+      // FormData üzerine direkt olarak verileri ekleyelim
+      const formData = new FormData();
+      formData.append("TenantId", "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+      
+      // Name değerinin boş olmadığından emin olalım ve doğru Key ile ekleyelim
+      if (!cleanName || cleanName.trim() === "") {
+        alert("Görev adı boş olamaz!");
+        setLoading(false);
+        return;
+      }
+      formData.append("Name", cleanName);
+      
+      formData.append("Description", description || "");
+      formData.append("DepartmentId", departman || "d1d4cae5-039d-415f-305e-08dd5ae73144");
+      formData.append("TaskTypeId", "");
+      formData.append("CreateUserId", createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
+      formData.append("Priority", oncelik || "3");
+      formData.append("Status", status || "Beklemede");
+      
+      // FormData içeriğini konsola yazdır
+      console.log("FormData içeriği:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+      
+      console.log("FormData doğrudan gönderiliyor...");
+      const response = await tasksServices.createTask(formData);
+      
+      console.log("API yanıtı:", response);
+      
+      if (response && response.isSuccess === true) {
+        handleSave(response.data || response);
+        setOpen(false);
+        alert("Görev başarıyla eklendi!");
+      } else {
+        console.error("API başarısız yanıt döndü:", response);
+        alert(`Görev eklenirken bir sorun oluştu: ${response.message || "İşlem başarısız."}`);
+      }
     } catch (error) {
       console.error("Task eklenirken hata oluştu:", error);
 
       if (error.response && error.response.data) {
         console.error("Hata detayları:", error.response.data);
-        alert(`Hata: ${JSON.stringify(error.response.data.errors || error.response.data)}`);
+        let errorMessage = "Görev eklenirken hata oluştu:\n";
+        
+        if (error.response.data.errors) {
+          const errors = error.response.data.errors;
+          console.error("Validation hataları:", errors);
+          
+          // Hata mesajlarını daha detaylı göster
+          for (const field in errors) {
+            errorMessage += `- ${field}: ${errors[field].join(", ")}\n`;
+          }
+          
+          // Name field hatası varsa özel olarak göster
+          if (errors.Name || errors.name) {
+            errorMessage += `\nÖnemli: Name alanı hatası tespit edildi.\n`;
+            errorMessage += `Orijinal değer: "${name}"\n`;
+            errorMessage += `Temizlenmiş değer: "${cleanName}"\n`;
+          }
+        } else if (typeof error.response.data === 'string') {
+          errorMessage += error.response.data;
+        } else {
+          errorMessage += JSON.stringify(error.response.data);
+        }
+        
+        alert(errorMessage);
+      } else {
+        alert(`Görev eklenirken bir hata oluştu: ${error.message}`);
       }
     } finally {
       setLoading(false);

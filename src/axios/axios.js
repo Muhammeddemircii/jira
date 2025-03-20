@@ -163,19 +163,137 @@ export const tasksServices = {
     }
   },
   
-  createTask: async (formData) => {
+  createTask: async (taskData) => {
     try {
+      // İstek gönderilmeden önce verileri detaylı olarak logla
+      console.log("Görev ekleme isteği gönderiliyor...");
+      
+      // taskData'nın FormData olup olmadığını kontrol et
+      let formData;
+      
+      if (taskData instanceof FormData) {
+        console.log("taskData zaten FormData olarak gönderilmiş");
+        formData = taskData;
+        
+        // FormData içeriğini log etmek için
+        console.log("Gelen FormData içeriği:");
+        for (let pair of formData.entries()) {
+          console.log(`${pair[0]}: ${pair[1]}`);
+        }
+        
+        // Name alanını özel olarak kontrol et
+        let nameValue = formData.get('Name');
+        if (!nameValue || nameValue.trim() === "") {
+          console.error("Name alanı FormData içinde boş veya tanımsız!");
+          throw new Error("Görev adı boş olamaz");
+        }
+        
+        console.log("Name alanı FormData içinde mevcut:", nameValue);
+      } else {
+        // JSON veri olarak geldi, FormData'ya çevir
+        console.log("API'ye gönderilecek veriler:", JSON.stringify(taskData, null, 2));
+        
+        // Name alanını büyük harfle kullanım için kontrol et
+        if (taskData.Name === undefined && taskData.name !== undefined) {
+          console.log("Name alanı küçük harfle gönderilmiş, büyük harfe dönüştürülüyor.");
+          taskData.Name = taskData.name;
+          delete taskData.name;
+        }
+        
+        // Name alanının değerini kontrol et ve düzelt
+        if (taskData.Name) {
+          // Gereksiz boşlukları temizle ve tek bir boşluğa dönüştür
+          taskData.Name = taskData.Name.trim().replace(/\s+/g, " ");
+          console.log("Name alanı düzeltildi:", taskData.Name);
+          console.log("Name uzunluğu:", taskData.Name.length);
+          
+          // İsim boş ise hata fırlat
+          if (taskData.Name === "") {
+            console.error("Name alanı boş!");
+            throw new Error("Görev adı boş olamaz");
+          }
+        } else {
+          console.error("Name alanı tanımsız!");
+          throw new Error("Görev adı tanımlanmamış");
+        }
+        
+        // Swagger'daki örneğe göre FormData kullan
+        formData = new FormData();
+        formData.append('TenantId', taskData.TenantId || taskData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+        formData.append('Name', taskData.Name);
+        formData.append('Description', taskData.Description || taskData.description || "");
+        formData.append('DepartmentId', taskData.DepartmentId || taskData.departmentId || "d1d4cae5-039d-415f-305e-08dd5ae73144");
+        formData.append('TaskTypeId', taskData.TaskTypeId || taskData.taskTypeId || ""); // Boş string olarak gönder
+        formData.append('CreateUserId', taskData.CreateUserId || taskData.createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
+        formData.append('Priority', taskData.Priority || taskData.priority || "3");
+        
+        // Dosya ve sorumlular için dizileri kontrol et
+        if (taskData.ResponsibleUsersId && taskData.ResponsibleUsersId.length > 0) {
+          taskData.ResponsibleUsersId.forEach(userId => {
+            formData.append('ResponsibleUsersId', userId);
+          });
+        }
+        
+        if (taskData.Files && taskData.Files.length > 0) {
+          taskData.Files.forEach(file => {
+            formData.append('Files', file);
+          });
+        }
+      }
+      
+      console.log("FormData hazır, API'ye gönderiliyor");
+      
+      // Son bir kez FormData içeriğini log et
+      console.log("API'ye gönderilecek FormData içeriği:");
+      for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+      }
+      
       const response = await api.post("/api/v1/Task", formData, {
-        withCredentials: true,
+        headers: {
+          // Content-Type başlığını FormData ile kullanırken kaldır
+          // Tarayıcı bunu otomatik olarak doğru boundary ile ayarlayacak
+        },
       });
       
-      console.log("Yeni task başarıyla eklendi:", response.data.data);
-      return response.data.data;
+      console.log("API Yanıtı:", response.data);
+      
+      if (response.data && response.data.isSuccess === true) {
+        console.log("Görev başarıyla eklendi:", response.data);
+      } else {
+        console.error("API başarısız yanıt döndü:", response.data);
+      }
+      
+      return response.data;
     } catch (error) {
-      console.error("Task eklenirken hata oluştu:", error);
+      console.error("Görev eklenirken hata oluştu:", error);
       
       if (error.response) {
         console.error("Hata detayları:", error.response.data);
+        
+        // Detaylı hata bilgilerini göster
+        if (error.response.data && error.response.data.errors) {
+          console.error("Validation hatası detayları:", JSON.stringify(error.response.data.errors, null, 2));
+          
+          // Name field hatasını özel olarak kontrol et
+          if (error.response.data.errors.Name || error.response.data.errors.name) {
+            console.error("Name alanı ile ilgili hata var!");
+            console.error("Gönderilen name değeri:", taskData.Name);
+            console.error("Karakter kodları:", [...taskData.Name].map(c => c.charCodeAt(0)));
+          }
+        }
+        
+        console.error("Hata status:", error.response.status);
+        console.error("Hata headers:", error.response.headers);
+        
+        // 401 Unauthorized hatası için özel mesaj
+        if (error.response.status === 401) {
+          throw new Error("Yetkilendirme hatası: Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın.");
+        }
+      } else if (error.request) {
+        console.error("İstek gönderildi ancak yanıt alınamadı:", error.request);
+      } else {
+        console.error("İstek oluşturulurken hata:", error.message);
       }
       throw error;
     }
