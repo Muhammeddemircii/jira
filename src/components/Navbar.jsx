@@ -39,14 +39,14 @@ function Navbar({ setIsOpen, isOpen }) {
         setTenantName(localStorage.getItem("tenant-name") || "Yükleniyor...");
         setRoleName(localStorage.getItem("user-role") || "Yükleniyor...");
         
-        // Delayed welcome message for better UX
+
         setTimeout(() => {
             setShowWelcome(true);
         }, 500);
     }, []);
 
     useEffect(() => {
-        // Update active page based on current location
+
         const path = location.pathname;
         if (path.includes("/HomePage")) {
             setActivePage("home");
@@ -85,11 +85,13 @@ function Navbar({ setIsOpen, isOpen }) {
         if (window.innerWidth < 768) setIsOpen(false);
     }
 
+    const handleProfile = () => {
+        navigate("/ProfilePage")
+    }
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
     const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
     
-    // Animation variants
     const navItemsVariants = {
         hidden: { opacity: 0, x: -20 },
         visible: (i) => ({
@@ -279,7 +281,7 @@ function Navbar({ setIsOpen, isOpen }) {
                             exit="hidden"
                             className="dropdown-content"
                         >
-                            <motion.div variants={dropdownItemVariants} className="dropdown-item">
+                            <motion.div variants={dropdownItemVariants} className="dropdown-item" onClick={handleProfile}>
                                 Profilim
                             </motion.div>
                             <motion.div variants={dropdownItemVariants} className="dropdown-item">

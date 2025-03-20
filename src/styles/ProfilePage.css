@@ -1,0 +1,16 @@
+.profile{
+    display: flex;
+    justify-content: space-around;
+}
+.profile-info{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+.profile-content>p{
+    font-size: 30px;
+}
+.profile-buttons{
+    display: flex;
+    flex-direction: column;
+}

@@ -10,6 +10,7 @@ import './App.css';
 import StaffPage from './pages/StaffPage';
 import DepartmentPage from './pages/DepartmentPage';
 import { store } from './store/store';
+import ProfilePage from './pages/ProfilePage';
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -40,6 +41,7 @@ function AppContent() {
         <Route path="/ForgotPasswordPages" element={<ForgotPasswordPages />} />
         <Route path="/StaffPage" element={<StaffPage />} />
         <Route path="/DepartmentPage" element={<DepartmentPage />} />
+        <Route path="/ProfilePage" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -69,7 +69,6 @@ export const departmentService = {
       console.error("Departman verileri alınırken hata oluştu:", error);
       console.error("Hata detayları:", error.response?.data);
       console.error("Hata durum kodu:", error.response?.status);
-      // Hata durumunda boş dizi döndür, bu sayede uygulama çökmez
       return [];
     }
   },
@@ -183,26 +182,15 @@ export const tasksServices = {
   },
 };
 
-export const roleService = {
-  getRoles: async () => {
+export const profileService = {
+  getProfile: async () => {
     try {
-      console.log("Roller için API isteği yapılıyor...");
-      const response = await api.get("/api/v1/User/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      console.log("Roles API yanıtı:", response.data);
-      
-      if (response.data && response.data.data) {
-        return response.data.data;
-      } else if (Array.isArray(response.data)) {
-        return response.data;
-      } else {
-        console.error("Roles API yanıtı geçersiz format:", response.data);
-        return [];
-      }
+      const response = await api.get("/api/v1/User?UserId=0de32311-bd40-4989-02a4-08dd49ab3521");
+      console.log("User API response:", response.data);
+      return response.data;
     } catch (error) {
-      console.error("Roller alınırken hata oluştu:", error);
-      console.error("Hata detayları:", error.response?.data);
-      console.error("Hata durum kodu:", error.response?.status);
-      return [];
+      console.error("Error fetching user profile:", error);
+      return null;
     }
   },
   
