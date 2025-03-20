@@ -1,6 +1,8 @@
 body{
   background-color:rgb(243,243,244);
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 .task-details-overlay {
   position: fixed; 
