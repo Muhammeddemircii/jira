@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginService } from '../axios/axios';
 import { setUser, setToken } from '../store/slices/authSlice';
-import {} from '../styles/Login.css' 
+import '../styles/Login.css' 
 
 function LoginPage() {
     const [email, setEmail] = useState('');
@@ -56,19 +56,31 @@ function LoginPage() {
                 <TextField
                     label="E-posta"
                     variant="outlined"
-                    sx={{ width: '250px' }}
+                    fullWidth
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     error={!!error}
+                    InputProps={{
+                        sx: {
+                            borderRadius: '8px',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        }
+                    }}
                 />
                 <TextField
                     label="Şifre"
                     type="password"
                     variant="outlined"
-                    sx={{ width: '250px' }}
+                    fullWidth
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     error={!!error}
+                    InputProps={{
+                        sx: {
+                            borderRadius: '8px',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        }
+                    }}
                 />
                 
                 <div className="giris-yap">
@@ -80,10 +92,13 @@ function LoginPage() {
                         {loading ? "Giriş Yapılıyor..." : "Giriş Yap"}
                     </Button>
                 </div>
+                
+                {error && <div className="error-message">{error}</div>}
             </form>
-
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <button className='forgot-password-button' onClick={handleForgotPassword}>Şifremi Unuttum</button>
+            
+            <button className='forgot-password-button' onClick={handleForgotPassword}>
+                Şifremi Unuttum
+            </button>
         </div>
     );
 }

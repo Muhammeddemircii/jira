@@ -53,7 +53,7 @@ function EditDepartmentModal() {
                 name: departmentName
             });
             
-            // API'nin beklediği formatta veri gönder
+
             const result = await departmentService.updateDepartment(
                 editingDepartment.id, 
                 { name: departmentName }
@@ -61,14 +61,12 @@ function EditDepartmentModal() {
 
             console.log("Güncelleme sonucu:", result);
 
-            // UI'da değişikliği göster
             const updatedDepartment = {
                 ...editingDepartment,
                 name: departmentName,
                 description: description
             };
             
-            // Redux store'u güncelle
             const updatedDepartments = departments.map(dept => 
                 dept.id === editingDepartment.id ? updatedDepartment : dept
             );
@@ -76,7 +74,6 @@ function EditDepartmentModal() {
             dispatch(setDepartments(updatedDepartments));
             toast.success(`${departmentName} başarıyla güncellendi.`);
             
-            // Veri gerçekten güncellenmiş mi kontrol et
             setTimeout(async () => {
                 try {
                     const refreshedData = await departmentService.getDepartments();

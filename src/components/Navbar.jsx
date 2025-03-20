@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import { faBars, faClipboardUser, faSolarPanel } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faChevronDown, faClipboardUser, faSolarPanel } from '@fortawesome/free-solid-svg-icons';
 import { } from '../styles/Navbar.css';
 import { } from '../styles/Cards.css';
 import { Button } from "@mui/material";
@@ -10,11 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { logout } from "../store/slices/authSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function Navbar({setIsOpen, isOpen}) {
+function Navbar({ setIsOpen, isOpen }) {
     const [name, setName] = useState("");
     const [tenantName, setTenantName] = useState("");
     const [roleName, setRoleName] = useState("");
     const [showWelcome, setShowWelcome] = useState(false);
+    const [tasksDropdownOpen, setTasksDropdownOpen] = useState(false);
+    const [taskSettingsDropdownOpen, setTaskSettingsDropdownOpen] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -29,7 +32,7 @@ function Navbar({setIsOpen, isOpen}) {
     const handlePanel = () => {
         navigate("/HomePage")
     }
-    
+
     const handleStaff = () => {
         navigate("/StaffPage")
     }
@@ -44,9 +47,14 @@ function Navbar({setIsOpen, isOpen}) {
         setIsOpen(!isOpen);
     };
 
-    const handleDepartment = () =>{
+    const handleDepartment = () => {
         navigate("/DepartmentPage")
     }
+
+    const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
+    const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
+    const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
+    
     return (
         <div>
             <div className="navbar">
@@ -92,12 +100,72 @@ function Navbar({setIsOpen, isOpen}) {
                             <FontAwesomeIcon icon={faClipboardUser} />
                             <h5>Personeller</h5>
                         </div>
-                        
+
                         <div className="icon-pano-container" onClick={handleDepartment}>
                             <FontAwesomeIcon icon={faClipboardUser} />
                             <h5>Departman</h5>
                         </div>
 
+                
+                        <div className="icon-dropdown-container" onClick={toggleTasksDropdown}>
+                            <FontAwesomeIcon icon={faClipboardUser} />
+                            <h5>Görevler</h5>
+                            <FontAwesomeIcon icon={faChevronDown} className={`chevron-icon ${tasksDropdownOpen ? "open" : ""}`} />
+                        </div>
+
+                        {tasksDropdownOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                transition={{ duration: 0.3 }}
+                                className="dropdown-content"
+                            >
+                                <div className="dropdown-item">Departman Görevleri</div>
+                                <div className="dropdown-item">Personel Görevleri</div>
+                            </motion.div>
+                        )}
+                        
+         
+                        <div className="icon-dropdown-container" onClick={toggleTaskSettingsDropdown}>
+                            <FontAwesomeIcon icon={faClipboardUser} />
+                            <h5>Görev Ayarları</h5>
+                            <FontAwesomeIcon icon={faChevronDown} className={`chevron-icon ${taskSettingsDropdownOpen ? "open" : ""}`} />
+                        </div>
+
+                        {taskSettingsDropdownOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                transition={{ duration: 0.3 }}
+                                className="dropdown-content"
+                            >
+                                <div className="dropdown-item">Kategoriler</div>
+                            </motion.div>
+                        )}
+                        
+                        <div className="icon-dropdown-container" onClick={toggleProfileDropdown}>
+                            <FontAwesomeIcon icon={faClipboardUser} />
+                            <h5>Profil</h5>
+                            <FontAwesomeIcon icon={faChevronDown} className={`chevron-icon ${profileDropdownOpen ? "open" : ""}`} />
+                        </div>
+
+                        {profileDropdownOpen && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                transition={{ duration: 0.3 }}
+                                className="dropdown-content"
+                            >
+                                <div className="dropdown-item">Profilim</div>
+                                <div className="dropdown-item">Yıllık İzinler</div>
+                                <div className="dropdown-item">Mesailer</div>
+                            </motion.div>
+                        )}
+                        
+                        <div className="icon-pano-container" onClick={handleDepartment}>
+                            <FontAwesomeIcon icon={faClipboardUser} />
+                            <h5>Bildirim ayarları</h5>
+                        </div>
                         <Button
                             onClick={handleLogout}
                             variant="contained"

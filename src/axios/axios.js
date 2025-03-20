@@ -83,7 +83,7 @@ export const departmentService = {
       });
       
       const response = await api.put(`/api/v1/Department`, {
-        departmentId: departmentId, // API'ye uygun parametre ismi
+        departmentId: departmentId, 
         name: departmentData.name,
         tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
       }, {
@@ -124,7 +124,6 @@ export const departmentService = {
     try {
       console.log(`Silme işlemi başlatılıyor. Department ID: ${departmentId}`);
       
-      // İçeriği URL'in bir parçası olarak gönder, params kullanma
       const response = await api.delete(`/api/v1/Department?DepartmentId=${departmentId}`);
       
       console.log("Silme başarılı:", response.data);
@@ -188,11 +187,13 @@ export const roleService = {
   getRoles: async () => {
     try {
       console.log("Roller için API isteği yapılıyor...");
-      const response = await api.get("/api/v1/Role/GetByTenantId?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+      const response = await api.get("/api/v1/User/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
       console.log("Roles API yanıtı:", response.data);
       
       if (response.data && response.data.data) {
         return response.data.data;
+      } else if (Array.isArray(response.data)) {
+        return response.data;
       } else {
         console.error("Roles API yanıtı geçersiz format:", response.data);
         return [];
@@ -201,7 +202,6 @@ export const roleService = {
       console.error("Roller alınırken hata oluştu:", error);
       console.error("Hata detayları:", error.response?.data);
       console.error("Hata durum kodu:", error.response?.status);
-      // Hata durumunda boş dizi döndür, bu sayede uygulama çökmez
       return [];
     }
   },
@@ -244,8 +244,8 @@ export const staffService = {
         birthDate: staffData.birthDate || null,
         phoneNumber: staffData.phoneNumber || "",
         tc: staffData.tc || "",
-        departmentIdList: staffData.departmentId ? [staffData.departmentId] : [],
-        roleId: staffData.roleId || ""
+        departmentIdList: staffData.departmentIdList || (staffData.departmentId ? [staffData.departmentId] : []),
+        userTypeId: staffData.userTypeId || ""
       };
 
       console.log("API'ye gönderilen personel verisi:", updatedData);
@@ -291,7 +291,6 @@ export const staffService = {
         throw new Error("Geçersiz kullanıcı ID'si");
       }
       
-      // Endpoint yapısı değişimi
       const response = await api.get(`/api/v1/User/GetById`, {
         params: { 
           UserId: id,
@@ -336,7 +335,6 @@ export const staffService = {
     try {
       console.log(`Şifre sıfırlama isteği gönderiliyor - Email: ${email}`);
       
-      // Swagger dökümana göre doğru endpoint ve format
       const response = await api.get(`/api/v1/User/ResetPassword`, {
         params: { 
           Email: email 

@@ -37,7 +37,6 @@ function AddDepartment({ onClose }) {
             const newDepartment = await departmentService.addDepartment(departmentName);
             if (newDepartment && newDepartment.data) {
                 dispatch(setDepartments([...departments, newDepartment.data]));
-                // Close the dialog after successful submission
                 onClose();
             } else {
                 setError('Departman eklenirken beklenmeyen bir hata oluştu.');

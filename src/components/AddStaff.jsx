@@ -26,10 +26,11 @@ import { departmentService, roleService, staffService } from '../axios/axios';
 import { useLocation } from 'react-router-dom';
 import 'dayjs/locale/tr';
 
+
 function AddStaff({ setOpenAddStaff, setLoadingStaffButton, onStaffAdded }) {
   const location = useLocation();
   const staffFromTable = location.state?.staff;
-  
+  const [availableUserTypes, setAvailableUserTypes] = useState([]);
   const [selectedDate, setSelectedDate] = useState(staffFromTable ? dayjs(staffFromTable.birthDate) : null);
   const [departmanListesi, setDepartmanListesi] = useState([]);
   const [roleListesi, setRoleListesi] = useState([]);
@@ -80,6 +81,8 @@ function AddStaff({ setOpenAddStaff, setLoadingStaffButton, onStaffAdded }) {
       }
 
       setUserTypes(availableUserTypes);
+      setAvailableUserTypes(availableUserTypes);
+      console.log("Ayarlanan yerel rol listesi:", availableUserTypes);
     };
 
     fetchUserTypes();
@@ -87,17 +90,16 @@ function AddStaff({ setOpenAddStaff, setLoadingStaffButton, onStaffAdded }) {
   }, []);
 
   useEffect(() => {
-    const fetchDepartmentsAndRoles = async () => {
+    const fetchDepartments = async () => {
       try {
         const departments = await departmentService.getDepartments();
-        const roles = await roleService.getRoles();
         setDepartmanListesi(departments);
-        setRoleListesi(roles);
       } catch (error) {
-        console.error("Departman veya rol verileri alınırken hata oluştu:", error);
+        console.error("Departman verileri alınırken hata oluştu:", error);
       }
     };
-    fetchDepartmentsAndRoles();
+    
+    fetchDepartments();
   }, []);
 
   const handleChange = (e) => {
@@ -332,26 +334,27 @@ function AddStaff({ setOpenAddStaff, setLoadingStaffButton, onStaffAdded }) {
             
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth error={!!formErrors.userTypeId} required>
-                <InputLabel>Rol Seçiniz</InputLabel>
+                <InputLabel>Görev/Rol</InputLabel>
                 <Select
+                  labelId="userType-label"
+                  id="userTypeId"
                   name="userTypeId"
                   value={staffData.userTypeId}
                   onChange={handleChange}
-                  label="Rol Seçiniz"
-                  variant="outlined"
+                  label="Görev/Rol"
                 >
-                  <MenuItem value="">
-                    <em>Rol Seçiniz</em>
-                  </MenuItem>
-                  {userTypes.map((type) => (
-                    <MenuItem key={type.value} value={type.value}>
-                      {type.text}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="">Seçiniz</MenuItem>
+                  {availableUserTypes.length > 0 ? (
+                    availableUserTypes.map((role) => (
+                      <MenuItem key={role.value} value={role.value}>
+                        {role.text}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>Rol bulunamadı</MenuItem>
+                  )}
                 </Select>
-                {formErrors.userTypeId && (
-                  <FormHelperText>{formErrors.userTypeId}</FormHelperText>
-                )}
+                {formErrors.userTypeId && <FormHelperText>{formErrors.userTypeId}</FormHelperText>}
               </FormControl>
             </Grid>
           </Grid>

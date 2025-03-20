@@ -58,26 +58,18 @@ function DepartmentTable() {
         if (window.confirm(`"${departmentName}" departmanını silmek istediğinize emin misiniz?`)) {
             try {
                 dispatch(setLoading(true));
-                console.log(`Silme işlemi başlıyor: ${departmentName} (ID: ${departmentId})`);
                 
-                // Silme işlemini gerçekleştir
                 const result = await departmentService.deleteDepartment(departmentId);
-                console.log("Silme işlemi sonucu:", result);
                 
-                // UI'dan kaldır
                 const updatedDepartments = departments.filter(dept => dept.id !== departmentId);
                 dispatch(setDepartments(updatedDepartments));
                 
                 toast.success(`"${departmentName}" departmanı başarıyla silindi.`);
                 
-                // Verinin gerçekten silindiğinden emin olmak için API'den güncel listeyi yeniden çek
                 setTimeout(async () => {
                     try {
-                        const refreshedData = await departmentService.getDepartments();
-                        console.log("Güncel departman listesi:", refreshedData);
-                        
+                        const refreshedData = await departmentService.getDepartments();                        
                         if (Array.isArray(refreshedData)) {
-                            // Silinen departman hala listede mi kontrol et
                             const stillExists = refreshedData.some(dept => dept.id === departmentId);
                             
                             if (stillExists) {
@@ -87,7 +79,6 @@ function DepartmentTable() {
                                 console.log("Silme işlemi sunucu tarafında da doğrulandı.");
                             }
                             
-                            // Listeyi güncelle
                             dispatch(setDepartments(refreshedData));
                         }
                     } catch (refreshError) {
@@ -123,7 +114,7 @@ function DepartmentTable() {
 
     const handleViewDetails = (department) => {
         console.log("View details for department:", department);
-        // Add view details logic here
+
     };
 
     if (loading) {
@@ -206,7 +197,7 @@ function DepartmentTable() {
                                         </IconButton>
                                     </Tooltip>
                                     
-                                    <Tooltip title="Detaylar">
+                                    <Tooltip title="Kullanıcılar">
                                         <IconButton 
                                             className="department-table-profile-button" 
                                             onClick={() => handleViewDetails(dept)}

@@ -19,8 +19,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { setEditModalOpen, updateStaffInList } from '../store/slices/staffSlice';
-import { staffService, departmentService, roleService } from '../axios/axios';
-import api from '../axios/axios';
+import { staffService, departmentService } from '../axios/axios';
 
 function EditStaffModal() {
   const dispatch = useDispatch();
@@ -28,7 +27,7 @@ function EditStaffModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [departments, setDepartments] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [availableUserTypes, setAvailableUserTypes] = useState([]);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -38,16 +37,56 @@ function EditStaffModal() {
     birthDate: '',
     tc: '',
     departmentId: '',
-    roleId: '',
+    userTypeId: '',
   });
 
+  // Initialize available user types based on current user role
   useEffect(() => {
-    const fetchData = async () => {
+    const setupUserTypes = () => {
+      let userTypes = [];
+      const userRole = localStorage.getItem('user-type-id');
+      console.log("Mevcut kullanıcı rolü:", userRole);
+
+      switch (userRole) {
+        case "1": // Admin
+          userTypes = [
+            { value: 2, text: "Departman Yöneticisi" },
+            { value: 3, text: "Personel" },
+            { value: 4, text: "Grup Yöneticisi" },
+          ];
+          console.log("Admin rolü: Tüm roller gösteriliyor");
+          break;
+        case "2": // Department Manager
+          userTypes = [
+            { value: 2, text: "Departman Yöneticisi" },
+            { value: 3, text: "Personel" }
+          ];
+          console.log("Departman Yöneticisi rolü: Filtrelenmiş roller", userTypes);
+          break;
+        case "3": // Staff
+          userTypes = [
+            { value: 3, text: "Personel" }
+          ];
+          console.log("Personel rolü: Filtrelenmiş roller", userTypes);
+          break;
+        default:
+          userTypes = [];
+          console.log("Bilinmeyen rol: Roller bulunamadı");
+      }
+
+      setAvailableUserTypes(userTypes);
+      console.log("Ayarlanan yerel rol listesi:", userTypes);
+    };
+
+    setupUserTypes();
+  }, []);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
       try {
         setLoading(true);
-        console.log("Departman ve rol verileri yükleniyor...");
+        console.log("Departman verileri yükleniyor...");
         
-        // Departmanları ve rolleri ayrı ayrı çekelim, bir hata diğerini etkilemesin
         try {
           const departmentsResponse = await departmentService.getDepartments();
           console.log("Departman verileri başarıyla yüklendi:", departmentsResponse);
@@ -56,39 +95,14 @@ function EditStaffModal() {
           console.error("Departman verileri yüklenirken hata:", deptError);
           setDepartments([]);
         }
-        
-        try {
-          console.log("roleService.getRoles() fonksiyonu çağrılıyor...");
-          // Alternatif endpoint denemesi
-          const response = await api.get("/api/v1/Role");
-          console.log("API'den gelen rol yanıtı (raw):", response);
-          
-          let rolesData = [];
-          
-          if (response && response.data) {
-            if (Array.isArray(response.data)) {
-              rolesData = response.data;
-            } else if (response.data.data && Array.isArray(response.data.data)) {
-              rolesData = response.data.data;
-            }
-          }
-          
-          console.log("İşlenmiş rol verisi:", rolesData);
-          setRoles(rolesData);
-        } catch (roleError) {
-          console.error("Rol verileri yüklenirken hata:", roleError);
-          setRoles([]);
-        }
-        
       } catch (error) {
         console.error("Veri yüklenirken genel hata:", error);
-        // Hata mesajını görüntüle ancak modalın çalışmasına engel olma
       } finally {
         setLoading(false);
       }
     };
     
-    fetchData();
+    fetchDepartments();
   }, []);
 
   useEffect(() => {
@@ -111,7 +125,7 @@ function EditStaffModal() {
             departmentId: editingStaff.userDepartmentsResponse && 
                           editingStaff.userDepartmentsResponse.length > 0 ? 
                           editingStaff.userDepartmentsResponse[0].departmentId : '',
-            roleId: editingStaff.roleId || '',
+            userTypeId: editingStaff.userTypeId || '',
           });
           
           // API'den detaylı veri çekmeyi dene, başarısız olursa üstteki veri kullanılacak
@@ -131,12 +145,11 @@ function EditStaffModal() {
                 departmentId: staffDetails.userDepartmentsResponse && 
                               staffDetails.userDepartmentsResponse.length > 0 ? 
                               staffDetails.userDepartmentsResponse[0].departmentId : prev.departmentId,
-                roleId: staffDetails.roleId || prev.roleId,
+                userTypeId: staffDetails.userTypeId || prev.userTypeId,
               }));
             }
           } catch (apiError) {
             console.warn("API'den personel detayları alınamadı, listedeki veriler kullanılacak:", apiError);
-            // Hata oluştuğunda zaten yüklenmiş veri formda kalacak, API hatası gösterme
           }
           
         } catch (error) {
@@ -179,7 +192,7 @@ function EditStaffModal() {
         phoneNumber: formData.phoneNumber || "",
         tc: formData.tc || "",
         departmentId: formData.departmentId || "",
-        roleId: formData.roleId || ""
+        userTypeId: formData.userTypeId || ""
       };
       
       console.log("Güncellenecek personel verisi:", staffData);
@@ -191,7 +204,8 @@ function EditStaffModal() {
       const updatedStaff = {
         ...editingStaff,
         ...formData,
-        roleName: getRoleName(formData.roleId),
+        userTypeId: formData.userTypeId,
+        roleName: getUserTypeName(formData.userTypeId),
         userDepartmentsResponse: formData.departmentId ? [
           {
             departmentId: formData.departmentId,
@@ -200,13 +214,13 @@ function EditStaffModal() {
         ] : []
       };
       
-      function getRoleName(roleId) {
-        if (!roleId) return editingStaff.roleName || '';
+      function getUserTypeName(userTypeId) {
+        if (!userTypeId) return editingStaff.roleName || '';
         
-        const role = roles.find(r => r.id === roleId);
-        if (!role) return editingStaff.roleName || '';
+        const userType = availableUserTypes.find(ut => ut.value === parseInt(userTypeId));
+        if (!userType) return editingStaff.roleName || '';
         
-        return role.roleName || role.name || editingStaff.roleName || '';
+        return userType.text || editingStaff.roleName || '';
       }
       
       dispatch(updateStaffInList(updatedStaff));
@@ -381,20 +395,20 @@ function EditStaffModal() {
             
             <Grid item xs={12} md={6}>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="role-label">Görev/Rol</InputLabel>
+                <InputLabel id="userType-label">Görev/Rol</InputLabel>
                 <Select
-                  labelId="role-label"
-                  id="roleId"
-                  name="roleId"
-                  value={formData.roleId}
+                  labelId="userType-label"
+                  id="userTypeId"
+                  name="userTypeId"
+                  value={formData.userTypeId}
                   onChange={handleChange}
                   label="Görev/Rol"
                 >
                   <MenuItem value="">Seçiniz</MenuItem>
-                  {roles && roles.length > 0 ? (
-                    roles.map((role, index) => (
-                      <MenuItem key={role.id || `role-${index}`} value={role.id || ''}>
-                        {role.roleName || role.name || `Rol ${index + 1}`}
+                  {availableUserTypes && availableUserTypes.length > 0 ? (
+                    availableUserTypes.map((role) => (
+                      <MenuItem key={role.value} value={role.value}>
+                        {role.text}
                       </MenuItem>
                     ))
                   ) : (
