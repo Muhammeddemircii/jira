@@ -1,5 +1,5 @@
 import React from 'react'
-import {} from '../styles/TaskDetails.css'
+import {} from '../../styles/Tasks/TaskDetails.css'
 
 function TaskDetails() {
   return (

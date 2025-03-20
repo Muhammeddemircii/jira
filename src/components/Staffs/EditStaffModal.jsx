@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
-import { setEditModalOpen, updateStaffInList } from '../store/slices/staffSlice';
-import { staffService, departmentService } from '../axios/axios';
+import { setEditModalOpen, updateStaffInList } from '../../store/slices/staffSlice';
+import { staffService, departmentService } from '../../axios/axios';
 
 function EditStaffModal() {
   const dispatch = useDispatch();

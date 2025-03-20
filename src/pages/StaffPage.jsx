@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { motion } from 'framer-motion';
-import StaffButton from '../components/StaffButton';
+import StaffButton from '../components/Staffs/StaffButton';
 import { Box } from '@mui/material';
 
 function StaffPage() {

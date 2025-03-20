@@ -3,7 +3,7 @@ import { Button, Typography, useMediaQuery } from '@mui/material';
 import DepartmentTable from './DepartmentTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import EditDepartmentModal from './EditDepartmentModal';
+import EditDepartmentModal from '../Departments/EditDepartmentModal';
 import AddDepartment from './AddDepartment';
 
 function DepartmentButton() {

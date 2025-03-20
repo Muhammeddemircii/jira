@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { departmentService } from '../axios/axios';
-import { setDepartments } from '../store/slices/departmanSlice';
+import { departmentService } from '../../axios/axios';
+import { setDepartments } from '../../store/slices/departmanSlice';
 import { 
     Dialog, 
     DialogTitle, 
@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import '../styles/DepartmentPage.css';
+import {} from '../../styles/Departments/DepartmentPage.css';
 
 function AddDepartment({ onClose }) {
     const dispatch = useDispatch();

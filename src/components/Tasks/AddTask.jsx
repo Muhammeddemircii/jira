@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { departmentService, tasksServices } from "../axios/axios";
+import { departmentService, tasksServices } from "../../axios/axios";
 import { TextField, InputLabel, MenuItem, FormControl, Select, Button } from "@mui/material";
-import "../styles/AddTask.css";
+import "../../styles/Tasks/AddTask.css";
 
 const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTentantId }) => {
   const [name, setName] = useState("");

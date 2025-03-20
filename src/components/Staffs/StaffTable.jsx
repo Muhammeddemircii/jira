@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import '../styles/StaffTable.css';
-import { departmentService, roleService, staffService } from '../axios/axios';
+import '../../styles/Staffs/StaffTable.css';
+import { departmentService, roleService, staffService } from '../../axios/axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setStaffList, setEditModalOpen, setEditingStaff, setLoading, setError } from '../store/slices/staffSlice';
+import { setStaffList, setEditModalOpen, setEditingStaff, setLoading, setError } from '../../store/slices/staffSlice';
 import { 
   FormControl, 
   MenuItem, 

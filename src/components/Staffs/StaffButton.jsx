@@ -9,8 +9,8 @@ import AddStaff from "./AddStaff";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import StaffTable from './StaffTable';
-import '../styles/StaffButton.css';
-import '../styles/AddStaff.css';
+import '../../styles/Staffs/StaffButton.css';
+import '../../styles/Staffs/AddStaff.css';
 
 function StaffButton() {
     const [loadingStaffButton, setLoadingStaffButton] = useState(false);

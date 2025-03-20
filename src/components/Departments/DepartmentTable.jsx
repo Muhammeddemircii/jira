@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { departmentService } from '../axios/axios';
+import { departmentService } from '../../axios/axios';
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { ImProfile } from "react-icons/im";
-import { setDepartments, setError, setLoading, setEditingDepartment, setEditModalOpen } from '../store/slices/departmanSlice';
-import EditDepartmentModal from './EditDepartmentModal';
+import { setDepartments, setError, setLoading, setEditingDepartment, setEditModalOpen } from '../../store/slices/departmanSlice';
+import EditDepartmentModal from '../Departments/EditDepartmentModal';
 import { 
     Paper, 
     Table, 
@@ -21,7 +21,7 @@ import {
     Tooltip
 } from '@mui/material';
 import { FaUsers } from 'react-icons/fa';
-import '../styles/DepartmentPage.css';
+import '../../styles/Departments/DepartmentPage.css';
 import { toast } from 'react-hot-toast';
 
 function DepartmentTable() {

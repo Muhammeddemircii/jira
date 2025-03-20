@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal } from '@mui/material';
 import '../styles/Panel.css';
-import AddTask from './AddTask';
+import AddTask from '../components/Tasks/AddTask';
 function Panel({ setTasks }) {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);

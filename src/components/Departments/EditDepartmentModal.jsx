@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { departmentService } from '../axios/axios';
-import { setEditModalOpen, setEditingDepartment, setDepartments } from '../store/slices/departmanSlice';
+import { departmentService } from "../../axios/axios";
+import { setEditModalOpen, setEditingDepartment, setDepartments } from '../../store/slices/departmanSlice';
 import { 
     Dialog, 
     DialogContent, 
@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import '../styles/DepartmentPage.css';
+import '../../styles/Departments/DepartmentPage.css';
 import { toast } from 'react-hot-toast';
 
 function EditDepartmentModal() {

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Cards from "../components/Cards";
 import { } from "../styles/Cards.css"
 import { departmentService } from "../axios/axios";
-import TaskDetails from "../components/TaskDetails";
+import TaskDetails from "../components/Tasks/TaskDetails";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);

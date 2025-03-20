@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import Navbar from "../components/Navbar";
 import { motion } from 'framer-motion';
-import DepartmentButton from '../components/DepartmentButton';
-import '../styles/DepartmentPage.css';
+import DepartmentButton from '../components/Departments/DepartmentButton';
+import '../styles/Departments/DepartmentPage.css';
 
 function DepartmentPage() {
   const [isOpen, setIsOpen] = useState(false);

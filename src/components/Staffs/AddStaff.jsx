@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/AddStaff.css';
+import '../../styles/Staffs/AddStaff.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { 
@@ -22,7 +22,7 @@ import {
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { departmentService, roleService, staffService } from '../axios/axios';
+import { departmentService, roleService, staffService } from '../../axios/axios';
 import { useLocation } from 'react-router-dom';
 import 'dayjs/locale/tr';
 
