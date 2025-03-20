@@ -189,6 +189,56 @@ export const tasksServices = {
         }
         
         console.log("Name alanı FormData içinde mevcut:", nameValue);
+        
+        // DurationId'yi kontrol et ve logla
+        const durationId = formData.get('DurationId');
+        if (durationId) {
+          console.log("DurationId FormData içinde mevcut:", durationId);
+          
+          // DurationId'nin doğru formatta olduğundan emin olalım
+          if (durationId.length < 5) {
+            console.error("DurationId çok kısa, geçersiz olabilir:", durationId);
+          } else {
+            console.log("DurationId geçerli formatta görünüyor");
+          }
+          
+          // DurationId'nin zaten formData içinde olduğundan emin olalım
+          // Bu, DurationId'nin API'ye iletilmesini garantiler
+          console.log("DurationId API'ye gönderilecek:", durationId);
+        } else {
+          console.warn("DurationId FormData içinde bulunamadı!");
+          
+          // Status'a göre manuel DurationId ekleme
+          const status = formData.get('Status');
+          if (status) {
+            console.log("Status değeri mevcut, ancak DurationId eksik. Status:", status);
+            
+            // Manuel olarak status'a göre DurationId ekle
+            let durationId = null;
+            if (status === "Reddedildi") {
+              durationId = "ba861628-2b0d-48cd-6eb0-08dd72b2e88e"; // Reddedilenler
+            } else if (status === "Beklemede") {
+              durationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e"; // Beklemede
+            } else if (status === "Atandı") {
+              durationId = "0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e"; // Yapımda
+            } else if (status === "Tamamlandı") {
+              durationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e"; // Tamamlananlar
+            }
+            
+            if (durationId) {
+              console.log(`"${status}" statüsü için DurationId manuel olarak ekleniyor:`, durationId);
+              formData.append('DurationId', durationId);
+            }
+          }
+        }
+        
+        // Formdata içinde DurationId'nin son durumunu kontrol et
+        const finalDurationId = formData.get('DurationId');
+        if (finalDurationId) {
+          console.log("API'ye gönderilecek DurationId:", finalDurationId);
+        } else {
+          console.error("DurationId hala bulunamadı, bir kategori seçilememesi problemi olabilir!");
+        }
       } else {
         // JSON veri olarak geldi, FormData'ya çevir
         console.log("API'ye gönderilecek veriler:", JSON.stringify(taskData, null, 2));
@@ -226,6 +276,12 @@ export const tasksServices = {
         formData.append('TaskTypeId', taskData.TaskTypeId || taskData.taskTypeId || ""); // Boş string olarak gönder
         formData.append('CreateUserId', taskData.CreateUserId || taskData.createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
         formData.append('Priority', taskData.Priority || taskData.priority || "3");
+        
+        // DurationId ekle
+        if (taskData.DurationId || taskData.durationId) {
+          formData.append('DurationId', taskData.DurationId || taskData.durationId);
+          console.log('DurationId eklendi:', taskData.DurationId || taskData.durationId);
+        }
         
         // Dosya ve sorumlular için dizileri kontrol et
         if (taskData.ResponsibleUsersId && taskData.ResponsibleUsersId.length > 0) {

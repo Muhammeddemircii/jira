@@ -13,6 +13,7 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
   const [createUserId, setCreateUserId] = useState(currentUserId || "");
   const [createUserTentantId, setCreateUserTentantId] = useState(currentUserTentantId || "");
   const [animationTaskClass, setAnimationTaskClass] = useState("");
+  const [durationIdMap, setDurationIdMap] = useState({});
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -25,6 +26,27 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
     };
 
     fetchDepartments();
+    
+    // Kategorileri (durations) yükle
+    const fetchCategories = async () => {
+      try {
+        const categories = await tasksServices.getCategories();
+        console.log("Kategoriler (Durations):", categories);
+        
+        // Status - DurationId eşleştirmesi için bir map oluştur
+        const durationMap = {};
+        categories.forEach(category => {
+          durationMap[category.name] = category.id;
+        });
+        
+        console.log("Durum - Kategori ID eşleştirmesi:", durationMap);
+        setDurationIdMap(durationMap);
+      } catch (error) {
+        console.error("Kategori verileri alınırken hata oluştu:", error);
+      }
+    };
+    
+    fetchCategories();
   }, []);
 
   const handleCloseAddTask = () => {
@@ -76,6 +98,35 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
       console.log("Temizlenmiş isim:", cleanName);
       console.log("İsim uzunluğu:", cleanName.length);
 
+      // Status değerine göre durationId belirle
+      let selectedDurationId = null;
+      
+      console.log("SEÇILEN STATÜ:", status);
+      
+      // Statüye göre sabit ID ataması yapalım
+      // Bu ID'ler API'den alınan kategorilerden emin olduğumuz değerler
+      if (status === "Reddedildi") {
+        // Reddedilenler kategorisi için sabit ID
+        selectedDurationId = "ba861628-2b0d-48cd-6eb0-08dd72b2e88e";
+        console.log(`"Reddedildi" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
+      } else if (status === "Beklemede") {
+        // Beklemede kategorisi için sabit ID
+        selectedDurationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e";
+        console.log(`"Beklemede" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
+      } else if (status === "Atandı") {
+        // Yapımda kategorisi için sabit ID
+        selectedDurationId = "0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e";
+        console.log(`"Atandı" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
+      } else if (status === "Tamamlandı") {
+        // Tamamlananlar kategorisi için sabit ID
+        selectedDurationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e";
+        console.log(`"Tamamlandı" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
+      } else {
+        // Tanımlanmamış bir durum için varsayılan olarak beklemede kategorisini kullan
+        selectedDurationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e"; // Beklemede kategorisi ID
+        console.warn(`Tanınmayan statü: ${status}, varsayılan "Beklemede" kategorisi kullanılıyor`);
+      }
+      
       // FormData üzerine direkt olarak verileri ekleyelim
       const formData = new FormData();
       formData.append("TenantId", "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
@@ -93,7 +144,17 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
       formData.append("TaskTypeId", "");
       formData.append("CreateUserId", createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
       formData.append("Priority", oncelik || "3");
-      formData.append("Status", status || "Beklemede");
+      
+      // Statü değerini de ekle
+      formData.append("Status", status);
+      
+      // DurationId değerini ekle
+      if (selectedDurationId) {
+        formData.append("DurationId", selectedDurationId);
+        console.log(`"${status}" statüsü için DurationId eklendi:`, selectedDurationId);
+      } else {
+        console.warn(`"${status}" statüsü için DurationId bulunamadı! Görev varsayılan kategoride oluşturulacak.`);
+      }
       
       // FormData içeriğini konsola yazdır
       console.log("FormData içeriği:");
