@@ -2,7 +2,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0 20px;
   background-color: transparent;
   height: 60px;
@@ -308,6 +308,8 @@ hr {
   transition: opacity 0.5s ease-in-out;
   text-align: right;
   padding-right: 20px;
+  margin-left: auto;
+  width: 100%;
 }
 
 .welcome-info.show {
@@ -356,4 +358,33 @@ hr {
   background: linear-gradient(135deg, #c0392b, #e74c3c);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  background: #20b494;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(32, 180, 148, 0.3);
+  margin-left: 20px;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  background: #1a9c80;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(32, 180, 148, 0.4);
+}
+
+.save-button svg {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.save-button span {
+  font-weight: 500;
+  font-size: 0.9rem;
 }

@@ -9,6 +9,7 @@ import { setUser } from './store/slices/authSlice';
 import './App.css';
 import StaffPage from './pages/StaffPage';
 import DepartmentPage from './pages/DepartmentPage';
+import TaskTypePage from './pages/TaskTypePage';
 import { store } from './store/store';
 import ProfilePage from './pages/ProfilePage';
 
@@ -41,6 +42,7 @@ function AppContent() {
         <Route path="/ForgotPasswordPages" element={<ForgotPasswordPages />} />
         <Route path="/StaffPage" element={<StaffPage />} />
         <Route path="/DepartmentPage" element={<DepartmentPage />} />
+        <Route path="/TaskTypePage" element={<TaskTypePage />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>

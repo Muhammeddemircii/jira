@@ -520,4 +520,80 @@ export const staffService = {
   }
 };
 
+export const taskTypeService = {
+  getTaskTypes: async () => {
+    try {
+      const response = await api.get("/api/v1/TaskType/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+      console.log("TaskType verileri:", response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error("TaskType verileri alınırken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  getTaskTypeById: async (id) => {
+    try {
+      const response = await api.get(`/api/v1/TaskType/${id}`);
+      console.log("TaskType verisi:", response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error(`${id} ID'li TaskType verisi alınırken hata oluştu:`, error);
+      throw error;
+    }
+  },
+
+  createTaskType: async (taskTypeData) => {
+    try {
+      const formData = new FormData();
+      formData.append('TenantId', "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
+      formData.append('Name', taskTypeData.name);
+      formData.append('RelatedDepartmentId', taskTypeData.relatedDepartmentId || "");
+
+      const response = await api.post("/api/v1/TaskType", formData);
+      console.log("TaskType oluşturma yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("TaskType oluşturulurken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  updateTaskType: async (taskTypeData) => {
+    try {
+      // Convert to JSON payload format as per Swagger docs
+      const jsonData = {
+        taskTypeId: taskTypeData.id,
+        name: taskTypeData.name,
+        title: taskTypeData.name, // Using name as title if not provided
+        relatedDepartmentId: taskTypeData.relatedDepartmentId || ""
+      };
+
+      console.log("TaskType güncelleme verisi:", jsonData);
+
+      const response = await api.put(`/api/v1/TaskType`, jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      console.log("TaskType güncelleme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("TaskType güncellenirken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  deleteTaskType: async (id) => {
+    try {
+      const response = await api.delete(`/api/v1/TaskType/${id}`);
+      console.log("TaskType silme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("TaskType silinirken hata oluştu:", error);
+      throw error;
+    }
+  }
+};
+
 export default api;
