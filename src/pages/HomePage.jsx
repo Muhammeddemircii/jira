@@ -39,9 +39,14 @@ const HomePage = () => {
       <div>
         <motion.div
           initial={{ scale: 1, x: 0 }}
-          animate={{ scale: isOpen ? 1 : 1, x: isOpen ? 245 : 45 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className={`${isOpen ? "w-full" : "w-full flex justify-center"}`}
+          animate={{ 
+            scale: isOpen ? 1 : 1, 
+            x: isOpen ? 250 : 0,
+            width: isOpen ? 'calc(100% - 280px)' : 'calc(100% - 100px)',
+            margin: isOpen ? '0 0 0 30px' : '0 auto',
+          }}
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          className={`main-content ${isOpen ? 'menu-open' : ''}`}
         >
           <Panel setTasks={setTasks} tasks={tasks} />
         </motion.div>
@@ -49,11 +54,12 @@ const HomePage = () => {
         <motion.div
           initial={{ x: 0 }}
           animate={{
-            x: isOpen ? 100 : 0,
-            width: isOpen ? 'calc(100% - 200px)' : '100%',
+            x: isOpen ? 250 : 0,
+            width: isOpen ? 'calc(100% - 280px)' : 'calc(100% - 100px)',
+            margin: isOpen ? '0 0 0 30px' : '0 auto',
           }}
-          transition={{ type: "spring", stiffness: 100 }}
-          className="flex flex-col items-center"
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          className={`flex flex-col items-center main-content ${isOpen ? 'menu-open' : ''}`}
         >
           {openDetails && (
             <div className="task-details-overlay">
@@ -63,7 +69,6 @@ const HomePage = () => {
               />
             </div>
           )}
-
 
           <Cards
             tasks={tasks}

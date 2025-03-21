@@ -58,16 +58,17 @@ function ProfilePage() {
 
             <AnimatePresence>
                 <motion.div
-                    className="profile-content-wrapper"
-                    initial={{ marginLeft: getMarginLeft() }}
+                    className={`profile-content-wrapper main-content ${isOpen ? 'menu-open' : ''}`}
+                    initial={{ x: 0 }}
                     animate={{ 
-                        marginLeft: getMarginLeft(),
-                        width: windowWidth <= 768 ? "100%" : `calc(100% - ${getMarginLeft()})`
+                        x: isOpen ? 250 : 0,
+                        width: isOpen ? 'calc(100% - 280px)' : 'calc(100% - 100px)',
+                        margin: isOpen ? '0 0 0 30px' : '0 auto',
                     }}
                     transition={{ 
                         type: "spring", 
-                        stiffness: 300, 
-                        damping: 30 
+                        stiffness: 100, 
+                        damping: 20 
                     }}
                 >
                     {profile ? (

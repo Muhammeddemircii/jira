@@ -102,11 +102,11 @@ function TaskTypeTable() {
                     // Silme işleminden sonra verileri yeniden çekelim
                     await refreshData();
                 } else {
-                    toast.error('Silme işlemi sırasında bir hata oluştu!');
+                    toast.error(response?.message || 'Silme işlemi sırasında bir hata oluştu!');
                 }
             } catch (error) {
                 console.error("Kategori silme hatası:", error);
-                toast.error('Silme işlemi sırasında bir hata oluştu!');
+                toast.error(error.response?.data?.message || 'Silme işlemi sırasında bir hata oluştu!');
             } finally {
                 setLoading(false);
             }

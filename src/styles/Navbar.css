@@ -81,6 +81,7 @@
 
 .navbar-nav.open {
   transform: translateX(0);
+  z-index: 1000;
 }
 
 .tenant-name {
@@ -387,4 +388,23 @@ hr {
 .save-button span {
   font-weight: 500;
   font-size: 0.9rem;
+}
+
+/* Main content animation styles */
+.main-content {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: calc(100% - 100px);
+  margin: 0 auto;
+}
+
+.main-content.menu-open {
+  width: calc(100% - 280px);
+  margin-left: 250px;
+}
+
+@media (max-width: 768px) {
+  .main-content.menu-open {
+    width: 100%;
+    margin-left: 0;
+  }
 }

@@ -545,12 +545,17 @@ export const taskTypeService = {
 
   createTaskType: async (taskTypeData) => {
     try {
-      const formData = new FormData();
-      formData.append('TenantId', "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      formData.append('Name', taskTypeData.name);
-      formData.append('RelatedDepartmentId', taskTypeData.relatedDepartmentId || "");
+      // Send as JSON according to Swagger docs
+      const jsonData = {
+        name: taskTypeData.name,
+        relatedDepartmentId: taskTypeData.relatedDepartmentId || "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+      };
 
-      const response = await api.post("/api/v1/TaskType", formData);
+      const response = await api.post("/api/v1/TaskType", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
       console.log("TaskType oluşturma yanıtı:", response.data);
       return response.data;
     } catch (error) {
@@ -586,7 +591,7 @@ export const taskTypeService = {
 
   deleteTaskType: async (id) => {
     try {
-      const response = await api.delete(`/api/v1/TaskType/${id}`);
+      const response = await api.delete(`/api/v1/TaskType?TaskTypeId=${id}`);
       console.log("TaskType silme yanıtı:", response.data);
       return response.data;
     } catch (error) {

@@ -24,8 +24,8 @@ function DepartmentPage() {
           width: isOpen ? 'calc(100% - 280px)' : 'calc(100% - 100px)',
           margin: isOpen ? '0 0 0 30px' : '0 auto',
         }}
-        transition={{ type: 'spring', stiffness: 100 }}
-        className="department-container"
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+        className={`department-container main-content ${isOpen ? 'menu-open' : ''}`}
       >
         <DepartmentButton />
       </motion.div>

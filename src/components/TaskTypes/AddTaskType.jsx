@@ -83,11 +83,11 @@ function AddTaskType({ open, setOpen, onTaskTypeAdded }) {
                     onTaskTypeAdded(response.data);
                 }
             } else {
-                toast.error('Kategori eklenirken bir hata oluştu!');
+                toast.error(response.message || 'Kategori eklenirken bir hata oluştu!');
             }
         } catch (error) {
             console.error("Kategori ekleme hatası:", error);
-            toast.error('Kategori eklenirken bir hata oluştu!');
+            toast.error(error.response?.data?.message || 'Kategori eklenirken bir hata oluştu!');
         } finally {
             setLoading(false);
         }
