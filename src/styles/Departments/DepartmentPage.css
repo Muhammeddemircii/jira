@@ -2,10 +2,8 @@
   padding: 20px;
   background-color: #f8f9fa;
   min-height: calc(100vh - 64px);
-  width: calc(100% - 70px);
   max-width: 100%;
   overflow-x: hidden;
-  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -160,7 +158,8 @@
 @media (max-width: 768px) {
   .department-container {
     padding: 16px 12px;
-    width: calc(100% - 40px);
+    width: 100%;
+    margin: 0 auto;
   }
   
   .department-header h1 {
