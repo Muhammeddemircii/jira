@@ -1,3 +1,39 @@
+.panel {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 25px;
+    margin: 15px 0;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.panel:hover {
+    transform: translateY(-2px);
+}
+
+.panel-button {
+    font-weight: 500 !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 3px 6px rgba(32, 180, 148, 0.2) !important;
+    margin-right: 10px !important;
+}
+
+.panel-button:hover {
+    background-color: #1aa285 !important;
+    box-shadow: 0 4px 8px rgba(32, 180, 148, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.panel-button:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 2px 4px rgba(32, 180, 148, 0.2) !important;
+}
+
 .panel-task {
     position: fixed;
     top: 50%;
@@ -8,6 +44,13 @@
     justify-content: flex-start;
     align-items: center;
     animation: slideDown 0.5s ease-out;
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    max-width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 .panel-task.open {
