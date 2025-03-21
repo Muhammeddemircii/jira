@@ -23,10 +23,12 @@ import {
 import { FaUsers } from 'react-icons/fa';
 import '../../styles/Departments/DepartmentPage.css';
 import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function DepartmentTable() {
     const dispatch = useDispatch();
     const { departments, error, loading } = useSelector(state => state.departments);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDepartman = async () => {
@@ -114,7 +116,7 @@ function DepartmentTable() {
 
     const handleViewDetails = (department) => {
         console.log("View details for department:", department);
-
+        navigate(`/StaffPage?departman=${department.id}`);
     };
 
     if (loading) {
@@ -197,13 +199,13 @@ function DepartmentTable() {
                                         </IconButton>
                                     </Tooltip>
                                     
-                                    <Tooltip title="Kullanıcılar">
+                                    <Tooltip title="Personel Listesi">
                                         <IconButton 
                                             className="department-table-profile-button" 
                                             onClick={() => handleViewDetails(dept)}
                                             size="small"
                                         >
-                                            <ImProfile />
+                                            <FaUsers />
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
