@@ -2,21 +2,24 @@ import React, { useState, useEffect } from 'react';
 import '../styles/AnnualLeave.css';
 
 const AnnualLeaveTable = ({ apiData }) => {
-  // Sample data - will be replaced with API data if provided
-
-
   // Use API data if provided, otherwise use default data
   const [leaveData, setLeaveData] = useState([]);
   
   // Update leaveData when apiData changes
   useEffect(() => {
-    if (apiData?.data && apiData.data.length > 0) {
+    console.log("AnnualLeaveTable - Received apiData:", apiData);
+    
+    if (apiData && Array.isArray(apiData)) {
       // Assign sequential IDs (1, 2, 3...) to the API data
-      const dataWithSequentialIds = apiData.data.map((item, index) => ({
+      const dataWithSequentialIds = apiData.map((item, index) => ({
         ...item,
         id: index + 1
       }));
       setLeaveData(dataWithSequentialIds);
+      console.log("İzin verileri yüklendi:", dataWithSequentialIds);
+    } else {
+      console.error("API yanıtı geçersiz format veya boş:", apiData);
+      setLeaveData([]);
     }
   }, [apiData]);
 

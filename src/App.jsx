@@ -45,7 +45,8 @@ function AppContent() {
         <Route path="/DepartmentPage" element={<DepartmentPage />} />
         <Route path="/TaskTypePage" element={<TaskTypePage />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
-        <Route path="/AnnualLeavesPage" element={<AnnualLeavesPage />} />
+        <Route path="/AnnualLeavesPage/:id" element={<AnnualLeavesPage />} />
+
       </Routes>
     </BrowserRouter>
   );

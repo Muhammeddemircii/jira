@@ -105,12 +105,18 @@ function Navbar({ setIsOpen, isOpen }) {
         if (window.innerWidth < 768) setIsOpen(false);
     }
     const handleAnnualLeave = () => {
-        navigate("/AnnualLeavesPage");
+        const id = localStorage.getItem("user-id"); // Kullanıcı ID'sini localStorage'dan al
+        if (!id) {
+            console.error("Hata: Kullanıcı ID bulunamadı!");
+            return;
+        }
+    
+        navigate(`/AnnualLeavesPage/${id}`);
         setActivePage("annualLeaves");
+    
         if (window.innerWidth < 768) setIsOpen(false);
-
-
-    }
+    };
+    
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
     const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);

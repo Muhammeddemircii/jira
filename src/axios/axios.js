@@ -36,6 +36,7 @@ export const loginService = {
         const departmentIdList = user.userDepartmentsResponse.map(department => department.departmentId);
         localStorage.setItem("user-department-id-list", JSON.stringify(departmentIdList));
         localStorage.setItem("user-data", JSON.stringify(user));
+        localStorage.setItem("user-id", user.id);
 
         return { success: true, user, token: accessToken };
       } else {
@@ -602,11 +603,33 @@ export const taskTypeService = {
 };
 
 export const AnnualLeavesService = {
-  getAnnualLeaves: async () => {
+  getAnnualLeaves: async (userId) => {
     try {
-      const response = await api.get("/api/v1/AnnualLeave/GetByUserId?UserId=0de32311-bd40-4989-02a4-08dd49ab3521")
-      return response.data;
+      console.log("Yıllık izin verileri için API isteği yapılıyor... UserId:", userId);
+      const response = await api.get(`/api/v1/AnnualLeave/GetByUserId?UserId=${userId}`);
+      console.log("Yıllık izin API yanıtı:", response.data);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Yıllık izin API yanıtı geçersiz format:", response.data);
+        return [];
+      }
     } catch (error) {
+      console.error("Yıllık izin verileri alınırken hata oluştu:", error);
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      return [];
+    }
+  }
+};
+
+
+export const overTimeServices = {
+  getOverTimesServices: async () => {
+    try{
+        const response = await api.get("")
+    } catch(error){
       console.log(error)
     }
   }
