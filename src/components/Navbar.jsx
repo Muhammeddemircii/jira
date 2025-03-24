@@ -58,6 +58,8 @@ function Navbar({ setIsOpen, isOpen }) {
             setActivePage("department");
         } else if (path.includes("/ProfilePage")) {
             setActivePage("profile");
+        } else if (path.includes("/AnnualLeavesPage")) {
+            setActivePage("annualLeaves");
         } else if (path.includes("/TaskTypePage")) {
             setActivePage("taskType");
         }
@@ -101,6 +103,13 @@ function Navbar({ setIsOpen, isOpen }) {
         navigate("/ProfilePage");
         setActivePage("profile");
         if (window.innerWidth < 768) setIsOpen(false);
+    }
+    const handleAnnualLeave = () => {
+        navigate("/AnnualLeavesPage");
+        setActivePage("annualLeaves");
+        if (window.innerWidth < 768) setIsOpen(false);
+
+
     }
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
@@ -150,13 +159,13 @@ function Navbar({ setIsOpen, isOpen }) {
         alert("Changes saved successfully!");
     };
     
-    // Function to track editing state
+
     const startEditing = () => {
         setIsEditing(true);
         setHasUnsavedChanges(true);
     };
     
-    // Monitor for unsaved changes
+
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (hasUnsavedChanges) {
@@ -343,12 +352,22 @@ function Navbar({ setIsOpen, isOpen }) {
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
-                    className="icon-dropdown-container"
-                    onClick={toggleProfileDropdown}
+                    className="tasks-dropdown"
                 >
-                    <FontAwesomeIcon icon={faUserCircle} />
-                    <h5>Profil</h5>
-                    <FontAwesomeIcon icon={faChevronDown} className={`chevron-icon ${profileDropdownOpen ? "open" : ""}`} />
+                    <div 
+                        className="icon-pano-container"
+                        onClick={toggleProfileDropdown}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <FontAwesomeIcon icon={faUserCircle} />
+                            <h5>Profil</h5>
+                        </div>
+                        <FontAwesomeIcon 
+                            icon={faChevronDown} 
+                            className={`arrow-icon ${profileDropdownOpen ? 'open' : ''}`}
+                        />
+                    </div>
                 </motion.div>
 
                 <AnimatePresence>
@@ -363,7 +382,7 @@ function Navbar({ setIsOpen, isOpen }) {
                             <motion.div variants={dropdownItemVariants} className={`dropdown-item ${activePage === "profile" ? "active" : ""}`} onClick={handleProfile}>
                                 Profilim
                             </motion.div>
-                            <motion.div variants={dropdownItemVariants} className="dropdown-item">
+                            <motion.div variants={dropdownItemVariants} className={`dropdown-item ${activePage === "annualLeaves" ? "active" : ""}`} onClick={handleAnnualLeave}>
                                 Yıllık İzinler
                             </motion.div>
                             <motion.div variants={dropdownItemVariants} className="dropdown-item">

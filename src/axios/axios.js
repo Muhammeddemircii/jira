@@ -9,7 +9,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("user-token");
-    
+
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -24,10 +24,10 @@ export const loginService = {
   login: async (email, password) => {
     try {
       const response = await api.post("/api/v1/User/Login", { email, password });
-      
+
       if (response.data.data && response.data.data.accessToken) {
         const { user, accessToken } = response.data.data;
-        
+
         localStorage.setItem("user-token", accessToken);
         localStorage.setItem("user-name", user.name);
         localStorage.setItem("tenant-name", user.tenantName);
@@ -36,7 +36,7 @@ export const loginService = {
         const departmentIdList = user.userDepartmentsResponse.map(department => department.departmentId);
         localStorage.setItem("user-department-id-list", JSON.stringify(departmentIdList));
         localStorage.setItem("user-data", JSON.stringify(user));
-        
+
         return { success: true, user, token: accessToken };
       } else {
         throw new Error("Giriş başarısız");
@@ -58,7 +58,7 @@ export const departmentService = {
       console.log("Departmanlar için API isteği yapılıyor...");
       const response = await api.get("/api/v1/Department/GetByTenant?tenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
       console.log("Departmanlar API yanıtı:", response.data);
-      
+
       if (response.data && response.data.data) {
         return response.data.data;
       } else {
@@ -80,9 +80,9 @@ export const departmentService = {
         name: departmentData.name,
         tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
       });
-      
+
       const response = await api.put(`/api/v1/Department`, {
-        departmentId: departmentId, 
+        departmentId: departmentId,
         name: departmentData.name,
         tenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
       }, {
@@ -118,13 +118,13 @@ export const departmentService = {
       throw error;
     }
   },
-  
+
   deleteDepartment: async (departmentId) => {
     try {
       console.log(`Silme işlemi başlatılıyor. Department ID: ${departmentId}`);
-      
+
       const response = await api.delete(`/api/v1/Department?DepartmentId=${departmentId}`);
-      
+
       console.log("Silme başarılı:", response.data);
       return response.data;
     } catch (error) {
@@ -151,7 +151,7 @@ export const tasksServices = {
       throw error;
     }
   },
-  
+
   getCategories: async () => {
     try {
       const response = await api.get("/api/v1/Duration/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
@@ -162,57 +162,57 @@ export const tasksServices = {
       throw error;
     }
   },
-  
+
   createTask: async (taskData) => {
     try {
       // İstek gönderilmeden önce verileri detaylı olarak logla
       console.log("Görev ekleme isteği gönderiliyor...");
-      
+
       // taskData'nın FormData olup olmadığını kontrol et
       let formData;
-      
+
       if (taskData instanceof FormData) {
         console.log("taskData zaten FormData olarak gönderilmiş");
         formData = taskData;
-        
+
         // FormData içeriğini log etmek için
         console.log("Gelen FormData içeriği:");
         for (let pair of formData.entries()) {
           console.log(`${pair[0]}: ${pair[1]}`);
         }
-        
+
         // Name alanını özel olarak kontrol et
         let nameValue = formData.get('Name');
         if (!nameValue || nameValue.trim() === "") {
           console.error("Name alanı FormData içinde boş veya tanımsız!");
           throw new Error("Görev adı boş olamaz");
         }
-        
+
         console.log("Name alanı FormData içinde mevcut:", nameValue);
-        
+
         // DurationId'yi kontrol et ve logla
         const durationId = formData.get('DurationId');
         if (durationId) {
           console.log("DurationId FormData içinde mevcut:", durationId);
-          
+
           // DurationId'nin doğru formatta olduğundan emin olalım
           if (durationId.length < 5) {
             console.error("DurationId çok kısa, geçersiz olabilir:", durationId);
           } else {
             console.log("DurationId geçerli formatta görünüyor");
           }
-          
+
           // DurationId'nin zaten formData içinde olduğundan emin olalım
           // Bu, DurationId'nin API'ye iletilmesini garantiler
           console.log("DurationId API'ye gönderilecek:", durationId);
         } else {
           console.warn("DurationId FormData içinde bulunamadı!");
-          
+
           // Status'a göre manuel DurationId ekleme
           const status = formData.get('Status');
           if (status) {
             console.log("Status değeri mevcut, ancak DurationId eksik. Status:", status);
-            
+
             // Manuel olarak status'a göre DurationId ekle
             let durationId = null;
             if (status === "Reddedildi") {
@@ -224,14 +224,14 @@ export const tasksServices = {
             } else if (status === "Tamamlandı") {
               durationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e"; // Tamamlananlar
             }
-            
+
             if (durationId) {
               console.log(`"${status}" statüsü için DurationId manuel olarak ekleniyor:`, durationId);
               formData.append('DurationId', durationId);
             }
           }
         }
-        
+
         // Formdata içinde DurationId'nin son durumunu kontrol et
         const finalDurationId = formData.get('DurationId');
         if (finalDurationId) {
@@ -242,21 +242,21 @@ export const tasksServices = {
       } else {
         // JSON veri olarak geldi, FormData'ya çevir
         console.log("API'ye gönderilecek veriler:", JSON.stringify(taskData, null, 2));
-        
+
         // Name alanını büyük harfle kullanım için kontrol et
         if (taskData.Name === undefined && taskData.name !== undefined) {
           console.log("Name alanı küçük harfle gönderilmiş, büyük harfe dönüştürülüyor.");
           taskData.Name = taskData.name;
           delete taskData.name;
         }
-        
+
         // Name alanının değerini kontrol et ve düzelt
         if (taskData.Name) {
           // Gereksiz boşlukları temizle ve tek bir boşluğa dönüştür
           taskData.Name = taskData.Name.trim().replace(/\s+/g, " ");
           console.log("Name alanı düzeltildi:", taskData.Name);
           console.log("Name uzunluğu:", taskData.Name.length);
-          
+
           // İsim boş ise hata fırlat
           if (taskData.Name === "") {
             console.error("Name alanı boş!");
@@ -266,7 +266,7 @@ export const tasksServices = {
           console.error("Name alanı tanımsız!");
           throw new Error("Görev adı tanımlanmamış");
         }
-        
+
         // Swagger'daki örneğe göre FormData kullan
         formData = new FormData();
         formData.append('TenantId', taskData.TenantId || taskData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
@@ -276,61 +276,61 @@ export const tasksServices = {
         formData.append('TaskTypeId', taskData.TaskTypeId || taskData.taskTypeId || ""); // Boş string olarak gönder
         formData.append('CreateUserId', taskData.CreateUserId || taskData.createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
         formData.append('Priority', taskData.Priority || taskData.priority || "3");
-        
+
         // DurationId ekle
         if (taskData.DurationId || taskData.durationId) {
           formData.append('DurationId', taskData.DurationId || taskData.durationId);
           console.log('DurationId eklendi:', taskData.DurationId || taskData.durationId);
         }
-        
+
         // Dosya ve sorumlular için dizileri kontrol et
         if (taskData.ResponsibleUsersId && taskData.ResponsibleUsersId.length > 0) {
           taskData.ResponsibleUsersId.forEach(userId => {
             formData.append('ResponsibleUsersId', userId);
           });
         }
-        
+
         if (taskData.Files && taskData.Files.length > 0) {
           taskData.Files.forEach(file => {
             formData.append('Files', file);
           });
         }
       }
-      
+
       console.log("FormData hazır, API'ye gönderiliyor");
-      
+
       // Son bir kez FormData içeriğini log et
       console.log("API'ye gönderilecek FormData içeriği:");
       for (let pair of formData.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
-      
+
       const response = await api.post("/api/v1/Task", formData, {
         headers: {
           // Content-Type başlığını FormData ile kullanırken kaldır
           // Tarayıcı bunu otomatik olarak doğru boundary ile ayarlayacak
         },
       });
-      
+
       console.log("API Yanıtı:", response.data);
-      
+
       if (response.data && response.data.isSuccess === true) {
         console.log("Görev başarıyla eklendi:", response.data);
       } else {
         console.error("API başarısız yanıt döndü:", response.data);
       }
-      
+
       return response.data;
     } catch (error) {
       console.error("Görev eklenirken hata oluştu:", error);
-      
+
       if (error.response) {
         console.error("Hata detayları:", error.response.data);
-        
+
         // Detaylı hata bilgilerini göster
         if (error.response.data && error.response.data.errors) {
           console.error("Validation hatası detayları:", JSON.stringify(error.response.data.errors, null, 2));
-          
+
           // Name field hatasını özel olarak kontrol et
           if (error.response.data.errors.Name || error.response.data.errors.name) {
             console.error("Name alanı ile ilgili hata var!");
@@ -338,10 +338,10 @@ export const tasksServices = {
             console.error("Karakter kodları:", [...taskData.Name].map(c => c.charCodeAt(0)));
           }
         }
-        
+
         console.error("Hata status:", error.response.status);
         console.error("Hata headers:", error.response.headers);
-        
+
         // 401 Unauthorized hatası için özel mesaj
         if (error.response.status === 401) {
           throw new Error("Yetkilendirme hatası: Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın.");
@@ -367,7 +367,7 @@ export const profileService = {
       return null;
     }
   },
-  
+
   getPagedRoles: async (endpoint) => {
     try {
       const response = await api.get(endpoint);
@@ -394,7 +394,7 @@ export const staffService = {
       throw error;
     }
   },
-  
+
   updateStaff: async (id, staffData) => {
     try {
       const updatedData = {
@@ -411,7 +411,7 @@ export const staffService = {
       };
 
       console.log("API'ye gönderilen personel verisi:", updatedData);
-      
+
       const response = await api.put("/api/v1/User", updatedData);
       return response.data;
     } catch (error) {
@@ -423,7 +423,7 @@ export const staffService = {
       throw error;
     }
   },
-  
+
   deleteUser: async (id, exitReason) => {
     try {
       const response = await api.delete(`/api/v1/User`, {
@@ -447,21 +447,21 @@ export const staffService = {
   getStaffById: async (id) => {
     try {
       console.log(`getStaffById fonksiyonu çağrıldı - ID: ${id}`);
-      
+
       if (!id) {
         console.error("getStaffById için ID parametresi geçersiz:", id);
         throw new Error("Geçersiz kullanıcı ID'si");
       }
-      
+
       const response = await api.get(`/api/v1/User/GetById`, {
-        params: { 
+        params: {
           UserId: id,
           TenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
         }
       });
-      
+
       console.log("getStaffById yanıtı:", response);
-      
+
       if (response.data && response.data.data) {
         return response.data.data;
       } else {
@@ -477,7 +477,7 @@ export const staffService = {
       throw error;
     }
   },
-  
+
   getPagedStaff: async (endpoint) => {
     try {
       const response = await api.get(endpoint);
@@ -492,17 +492,17 @@ export const staffService = {
       throw error;
     }
   },
-  
+
   resetPassword: async (email) => {
     try {
       console.log(`Şifre sıfırlama isteği gönderiliyor - Email: ${email}`);
-      
+
       const response = await api.get(`/api/v1/User/ResetPassword`, {
-        params: { 
-          Email: email 
+        params: {
+          Email: email
         }
       });
-      
+
       console.log("Şifre sıfırlama isteği gönderildi:", response.data);
       return {
         success: true,
@@ -601,4 +601,14 @@ export const taskTypeService = {
   }
 };
 
+export const AnnualLeavesService = {
+  getAnnualLeaves: async () => {
+    try {
+      const response = await api.get("/api/v1/AnnualLeave/GetByUserId?UserId=0de32311-bd40-4989-02a4-08dd49ab3521")
+      return response.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
 export default api;

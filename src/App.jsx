@@ -12,6 +12,7 @@ import DepartmentPage from './pages/DepartmentPage';
 import TaskTypePage from './pages/TaskTypePage';
 import { store } from './store/store';
 import ProfilePage from './pages/ProfilePage';
+import AnnualLeavesPage from './pages/AnnualLeavesPage';
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -44,6 +45,7 @@ function AppContent() {
         <Route path="/DepartmentPage" element={<DepartmentPage />} />
         <Route path="/TaskTypePage" element={<TaskTypePage />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
+        <Route path="/AnnualLeavesPage" element={<AnnualLeavesPage />} />
       </Routes>
     </BrowserRouter>
   );
