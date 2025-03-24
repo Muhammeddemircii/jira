@@ -34,51 +34,52 @@
     box-shadow: 0 2px 4px rgba(32, 180, 148, 0.2) !important;
 }
 
+/* Override MUI Modal styling */
+.MuiModal-root {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .panel-task {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: static !important;
+    transform: none !important;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    animation: slideDown 0.5s ease-out;
-    background-color: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    margin: 0;
     max-width: 90%;
-    max-height: 85vh;
-    overflow-y: auto;
+    max-height: 90vh;
+    overflow: hidden;
 }
 
 .panel-task.open {
-    animation: slideDown 0.5s ease-out;
+    animation: none;
 }
 
 .panel-task.close {
-    animation: slideUp 0.5s ease-in;
+    animation: none;
 }
 
-@keyframes slideDown {
+@keyframes fadeIn {
     0% {
-        transform: translate(-50%, -150%);
         opacity: 0;
     }
     100% {
-        transform: translate(-50%, -50%);
         opacity: 1;
     }
 }
 
-@keyframes slideUp {
+@keyframes fadeOut {
     0% {
-        transform: translate(-50%, -50%);
         opacity: 1;
     }
     100% {
-        transform: translate(-50%, 150%);
         opacity: 0;
     }
 }
