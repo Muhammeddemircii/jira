@@ -24,6 +24,7 @@ import {
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { FaUsers } from 'react-icons/fa';
+import { Add as AddIcon } from '@mui/icons-material';
 import { companyService } from '../../axios/axios';
 import '../../styles/Companies/Companies.css';
 import { toast } from 'react-hot-toast';
@@ -33,7 +34,17 @@ function Companies() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [usersDialogOpen, setUsersDialogOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    title: '',
+    grupName: '',
+    domain: ''
+  });
   const userTypeId = localStorage.getItem('user-type-id');
 
   useEffect(() => {
@@ -51,7 +62,8 @@ function Companies() {
     try {
       setLoading(true);
       const response = await companyService.getCompanies();
-      setCompanies(response.data || []);
+      const companiesData = response?.data || [];
+      setCompanies(companiesData);
     } catch (error) {
       console.error("Şirket verileri alınırken hata:", error);
       toast.error("Şirket verileri alınırken bir hata oluştu.");
@@ -60,10 +72,25 @@ function Companies() {
     }
   };
 
+  const handleAddClick = () => {
+    setFormData({
+      name: '',
+      title: '',
+      grupName: '',
+      domain: ''
+    });
+    setAddDialogOpen(true);
+  };
+
   const handleEdit = (company) => {
-    // TODO: Implement edit functionality
-    console.log("Edit company:", company);
-    toast.info("Düzenleme özelliği yakında eklenecek.");
+    setSelectedCompany(company);
+    setFormData({
+      name: company.name,
+      title: company.title,
+      grupName: company.grupName,
+      domain: company.domain
+    });
+    setEditDialogOpen(true);
   };
 
   const handleDelete = (company) => {
@@ -87,14 +114,41 @@ function Companies() {
 
   const handleViewUsers = async (company) => {
     try {
-      const users = await companyService.getCompanyUsers(company.id);
-      console.log("Company users:", users);
-      // TODO: Implement user list view
-      toast.info("Kullanıcı listesi özelliği yakında eklenecek.");
+      const response = await companyService.getCompanyUsers(company.id);
+      const usersData = response?.data || [];
+      setUsers(usersData);
+      setSelectedCompany(company);
+      setUsersDialogOpen(true);
     } catch (error) {
       console.error("Kullanıcılar alınırken hata:", error);
       toast.error("Kullanıcılar alınırken bir hata oluştu.");
     }
+  };
+
+  const handleSubmit = async (isEdit = false) => {
+    try {
+      if (isEdit && selectedCompany) {
+        await companyService.updateCompany(selectedCompany.id, formData);
+        toast.success("Şirket başarıyla güncellendi.");
+      } else {
+        await companyService.createCompany(formData);
+        toast.success("Şirket başarıyla eklendi.");
+      }
+      fetchCompanies();
+      setAddDialogOpen(false);
+      setEditDialogOpen(false);
+      setSelectedCompany(null);
+    } catch (error) {
+      console.error("Şirket işlemi sırasında hata:", error);
+      toast.error("İşlem sırasında bir hata oluştu.");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   if (loading) {
@@ -126,6 +180,15 @@ function Companies() {
               sx={{ ml: 1, bgcolor: '#20b494', color: 'white' }} 
             />
           </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleAddClick}
+            sx={{ ml: 2 }}
+          >
+            Şirket Ekle
+          </Button>
         </Box>
 
         <TableContainer>
@@ -140,7 +203,7 @@ function Companies() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {companies.map((company) => (
+              {Array.isArray(companies) && companies.map((company) => (
                 <TableRow key={company.id}>
                   <TableCell>{company.name}</TableCell>
                   <TableCell>{company.title}</TableCell>
@@ -184,6 +247,107 @@ function Companies() {
         </TableContainer>
       </Paper>
 
+      {/* Add Company Dialog */}
+      <Dialog open={addDialogOpen} onClose={() => setAddDialogOpen(false)}>
+        <DialogTitle>Yeni Şirket Ekle</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Şirket Adı"
+            type="text"
+            fullWidth
+            value={formData.name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="title"
+            label="Başlık"
+            type="text"
+            fullWidth
+            value={formData.title}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="grupName"
+            label="Grup Adı"
+            type="text"
+            fullWidth
+            value={formData.grupName}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="domain"
+            label="Domain"
+            type="text"
+            fullWidth
+            value={formData.domain}
+            onChange={handleInputChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddDialogOpen(false)}>İptal</Button>
+          <Button onClick={() => handleSubmit(false)} color="primary">
+            Ekle
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Company Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <DialogTitle>Şirket Düzenle</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Şirket Adı"
+            type="text"
+            fullWidth
+            value={formData.name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="title"
+            label="Başlık"
+            type="text"
+            fullWidth
+            value={formData.title}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="grupName"
+            label="Grup Adı"
+            type="text"
+            fullWidth
+            value={formData.grupName}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="domain"
+            label="Domain"
+            type="text"
+            fullWidth
+            value={formData.domain}
+            onChange={handleInputChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>İptal</Button>
+          <Button onClick={() => handleSubmit(true)} color="primary">
+            Güncelle
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -205,6 +369,43 @@ function Companies() {
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
             Sil
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Users Dialog */}
+      <Dialog 
+        open={usersDialogOpen} 
+        onClose={() => setUsersDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {selectedCompany?.name} - Kullanıcılar
+        </DialogTitle>
+        <DialogContent>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ad Soyad</TableCell>
+                  <TableCell>E-posta</TableCell>
+                  <TableCell>Telefon</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.isArray(users) && users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.name} {user.surname}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.phone}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUsersDialogOpen(false)}>Kapat</Button>
         </DialogActions>
       </Dialog>
     </Box>

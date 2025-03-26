@@ -635,6 +635,8 @@ export const overTimeServices = {
   }
 }
 
+// ... existing code ...
+
 export const companyService = {
   getCompanies: async () => {
     try {
@@ -650,20 +652,17 @@ export const companyService = {
     }
   },
 
-  addCompany: async (companyData) => {
+  createCompany: async (companyData) => {
     try {
-      const userId = localStorage.getItem('user-id');
-      if (!userId) {
-        throw new Error("Kullanıcı ID'si bulunamadı");
-      }
-      const response = await api.post(`/api/v1/Tenant/Create?UserId=${userId}`, companyData);
-      return response.data;
+      const response = await api.post("/api/v1/Tenant", companyData);
+      return response;
     } catch (error) {
-      console.error("Şirket eklenirken hata oluştu:", error);
+      console.error("Şirket eklenirken hata:", error);
       throw error;
     }
   },
 
+  
   updateCompany: async (companyId, companyData) => {
     try {
       const userId = localStorage.getItem('user-id');
@@ -706,5 +705,3 @@ export const companyService = {
     }
   }
 };
-
-export default api;
