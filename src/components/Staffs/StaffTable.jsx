@@ -35,6 +35,7 @@ function StaffTable({ refreshTrigger = 0 }) {
   const [pageSize] = useState(10);
   const [hasMore, setHasMore] = useState(true);
   const [filtered, setFiltered] = useState(false);
+  const [isPersonnel, setIsPersonnel] = useState(false);
   
   // Ref'leri burada tanımla
   const observer = useRef();
@@ -48,6 +49,12 @@ function StaffTable({ refreshTrigger = 0 }) {
   const navigate = useNavigate();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
+
+  // Check user role
+  useEffect(() => {
+    const userRole = localStorage.getItem("user-role") || "";
+    setIsPersonnel(userRole.toLowerCase() === "personel");
+  }, []);
 
   const fetchStaff = useCallback(async (pageNumber, departmentId = '', shouldAppend = false) => {
     // Aynı departman için gereksiz isteği engelle
@@ -474,7 +481,7 @@ function StaffTable({ refreshTrigger = 0 }) {
                   <th>Tel No</th>
                   <th>Departman</th>
                   <th>Görev</th>
-                  <th style={{ width: '100px' }}>İşlemler</th>
+                  {!isPersonnel && <th style={{ width: '100px' }}>İşlemler</th>}
                 </tr>
               </thead>
 
@@ -518,16 +525,18 @@ function StaffTable({ refreshTrigger = 0 }) {
                         sx={{ fontSize: '0.7rem' }} 
                       />
                     </td>
-                    <td>
-                      <Tooltip title="İşlemler">
-                        <IconButton
-                          size="small"
-                          onClick={(event) => handleMenuOpen(event, staff)}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </td>
+                    {!isPersonnel && (
+                      <td>
+                        <Tooltip title="İşlemler">
+                          <IconButton
+                            size="small"
+                            onClick={(event) => handleMenuOpen(event, staff)}
+                          >
+                            <MoreVertIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

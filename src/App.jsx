@@ -13,6 +13,7 @@ import TaskTypePage from './pages/TaskTypePage';
 import { store } from './store/store';
 import ProfilePage from './pages/ProfilePage';
 import AnnualLeavesPage from './pages/AnnualLeavesPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function AppContent() {
         <Route path="/TaskTypePage" element={<TaskTypePage />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
         <Route path="/AnnualLeavesPage/:id" element={<AnnualLeavesPage />} />
+        <Route path="/NotificationsPage" element={<NotificationsPage />} />
 
       </Routes>
     </BrowserRouter>

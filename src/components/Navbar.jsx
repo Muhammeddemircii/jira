@@ -29,9 +29,11 @@ function Navbar({ setIsOpen, isOpen }) {
     const [tasksDropdownOpen, setTasksDropdownOpen] = useState(false);
     const [taskSettingsDropdownOpen, setTaskSettingsDropdownOpen] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const [notificationsDropdownOpen, setNotificationsDropdownOpen] = useState(false);
     const [activePage, setActivePage] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [isPersonnel, setIsPersonnel] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -40,7 +42,9 @@ function Navbar({ setIsOpen, isOpen }) {
     useEffect(() => {
         setName(localStorage.getItem("user-name") || "Misafir");
         setTenantName(localStorage.getItem("tenant-name") || "Yükleniyor...");
-        setRoleName(localStorage.getItem("user-role") || "Yükleniyor...");
+        const userRole = localStorage.getItem("user-role") || "Yükleniyor...";
+        setRoleName(userRole);
+        setIsPersonnel(userRole.toLowerCase() === "personel");
         
 
         setTimeout(() => {
@@ -62,8 +66,25 @@ function Navbar({ setIsOpen, isOpen }) {
             setActivePage("annualLeaves");
         } else if (path.includes("/TaskTypePage")) {
             setActivePage("taskType");
+        } else if (path.includes("/NotificationsPage")) {
+            setActivePage("notifications");
         }
     }, [location]);
+
+    // Redirect if personnel tries to access unauthorized pages
+    useEffect(() => {
+        if (isPersonnel) {
+            const path = location.pathname;
+            const authorizedPaths = ["/HomePage", "/StaffPage", "/ProfilePage", "/NotificationsPage"];
+            
+            // Check if current path is not authorized
+            const isAuthorized = authorizedPaths.some(authorizedPath => path.includes(authorizedPath));
+            
+            if (!isAuthorized && path !== "/") {
+                navigate("/HomePage");
+            }
+        }
+    }, [location, isPersonnel, navigate]);
 
     const handlePanel = () => {
         navigate("/HomePage");
@@ -104,6 +125,13 @@ function Navbar({ setIsOpen, isOpen }) {
         setActivePage("profile");
         if (window.innerWidth < 768) setIsOpen(false);
     }
+    
+    const handleNotifications = () => {
+        navigate("/NotificationsPage");
+        setActivePage("notifications");
+        if (window.innerWidth < 768) setIsOpen(false);
+    }
+    
     const handleAnnualLeave = () => {
         const id = localStorage.getItem("user-id"); // Kullanıcı ID'sini localStorage'dan al
         if (!id) {
@@ -120,6 +148,7 @@ function Navbar({ setIsOpen, isOpen }) {
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
     const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
+    const toggleNotificationsDropdown = () => setNotificationsDropdownOpen(!notificationsDropdownOpen);
     
     const navItemsVariants = {
         hidden: { opacity: 0, x: -20 },
@@ -257,6 +286,7 @@ function Navbar({ setIsOpen, isOpen }) {
                     <h5>Personeller</h5>
                 </motion.div>
 
+                {!isPersonnel && (
                 <motion.div 
                     custom={2} 
                     variants={navItemsVariants}
@@ -268,7 +298,9 @@ function Navbar({ setIsOpen, isOpen }) {
                     <FontAwesomeIcon icon={faBuilding} />
                     <h5>Departman</h5>
                 </motion.div>
+                )}
 
+                {!isPersonnel && (
                 <motion.div 
                     custom={3} 
                     variants={navItemsVariants}
@@ -308,7 +340,9 @@ function Navbar({ setIsOpen, isOpen }) {
                         )}
                     </AnimatePresence>
                 </motion.div>
+                )}
 
+                {!isPersonnel && (
                 <motion.div 
                     custom={4} 
                     variants={navItemsVariants}
@@ -352,6 +386,7 @@ function Navbar({ setIsOpen, isOpen }) {
                         )}
                     </AnimatePresence>
                 </motion.div>
+                )}
 
                 <motion.div 
                     custom={5} 
@@ -391,12 +426,59 @@ function Navbar({ setIsOpen, isOpen }) {
                             <motion.div variants={dropdownItemVariants} className={`dropdown-item ${activePage === "annualLeaves" ? "active" : ""}`} onClick={handleAnnualLeave}>
                                 Yıllık İzinler
                             </motion.div>
+                            {!isPersonnel && (
                             <motion.div variants={dropdownItemVariants} className="dropdown-item">
                                 Mesailer
                             </motion.div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
+                
+                {/* Bildirimler kısmı */}
+                <motion.div 
+                    custom={6} 
+                    variants={navItemsVariants}
+                    initial="hidden"
+                    animate={isOpen ? "visible" : "hidden"}
+                    className="tasks-dropdown"
+                >
+                    <div 
+                        className="icon-pano-container"
+                        onClick={toggleNotificationsDropdown}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <FontAwesomeIcon icon={faBell} />
+                            <h5>Bildirimler</h5>
+                        </div>
+                        <FontAwesomeIcon 
+                            icon={faChevronDown} 
+                            className={`arrow-icon ${notificationsDropdownOpen ? 'open' : ''}`}
+                        />
+                    </div>
+                    
+                    <AnimatePresence>
+                        {notificationsDropdownOpen && (
+                            <motion.div 
+                                className="tasks-dropdown-content"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div 
+                                    className={`dropdown-item ${activePage === "notifications" ? "active" : ""}`}
+                                    onClick={handleNotifications}
+                                    style={{ display: 'flex', alignItems: 'center' }}
+                                >
+                                    <FontAwesomeIcon icon={faBell} style={{ marginRight: '8px' }} />
+                                    <span>Tüm Bildirimler</span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
                 
                 <motion.div
                     custom={7}
