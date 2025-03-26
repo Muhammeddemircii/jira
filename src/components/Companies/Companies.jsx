@@ -42,8 +42,9 @@ function Companies() {
   const [formData, setFormData] = useState({
     name: '',
     title: '',
-    grupName: '',
-    domain: ''
+    logo: '',
+    domain: '',
+    tenantGrupId: localStorage.getItem('tenant-grup-id') || '1160fc5a-dd69-452e-83af-da3510419b90'
   });
   const userTypeId = localStorage.getItem('user-type-id');
 
@@ -76,8 +77,9 @@ function Companies() {
     setFormData({
       name: '',
       title: '',
-      grupName: '',
-      domain: ''
+      logo: '',
+      domain: '',
+      tenantGrupId: localStorage.getItem('tenant-grup-id') || '1160fc5a-dd69-452e-83af-da3510419b90'
     });
     setAddDialogOpen(true);
   };
@@ -87,8 +89,9 @@ function Companies() {
     setFormData({
       name: company.name,
       title: company.title,
-      grupName: company.grupName,
-      domain: company.domain
+      logo: company.logo || '',
+      domain: company.domain,
+      tenantGrupId: localStorage.getItem('tenant-grup-id') || '1160fc5a-dd69-452e-83af-da3510419b90'
     });
     setEditDialogOpen(true);
   };
@@ -127,11 +130,19 @@ function Companies() {
 
   const handleSubmit = async (isEdit = false) => {
     try {
+      // TenantGrupId'nin formData içinde olduğundan emin olalım
+      const submitData = {
+        ...formData,
+        tenantGrupId: localStorage.getItem('tenant-grup-id') || '1160fc5a-dd69-452e-83af-da3510419b90'
+      };
+      
+      console.log("Gönderilen veri:", submitData);
+      
       if (isEdit && selectedCompany) {
-        await companyService.updateCompany(selectedCompany.id, formData);
+        await companyService.updateCompany(selectedCompany.id, submitData);
         toast.success("Şirket başarıyla güncellendi.");
       } else {
-        await companyService.createCompany(formData);
+        await companyService.createCompany(submitData);
         toast.success("Şirket başarıyla eklendi.");
       }
       fetchCompanies();
@@ -141,6 +152,9 @@ function Companies() {
     } catch (error) {
       console.error("Şirket işlemi sırasında hata:", error);
       toast.error("İşlem sırasında bir hata oluştu.");
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+      }
     }
   };
 
@@ -272,15 +286,6 @@ function Companies() {
           />
           <TextField
             margin="dense"
-            name="grupName"
-            label="Grup Adı"
-            type="text"
-            fullWidth
-            value={formData.grupName}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
             name="domain"
             label="Domain"
             type="text"
@@ -318,15 +323,6 @@ function Companies() {
             type="text"
             fullWidth
             value={formData.title}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="grupName"
-            label="Grup Adı"
-            type="text"
-            fullWidth
-            value={formData.grupName}
             onChange={handleInputChange}
           />
           <TextField

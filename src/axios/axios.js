@@ -33,6 +33,7 @@ export const loginService = {
         localStorage.setItem("tenant-name", user.tenantName);
         localStorage.setItem("user-role", user.roleName);
         localStorage.setItem("user-type-id", user.userTypeId);
+        localStorage.setItem("tenant-grup-id", "1160fc5a-dd69-452e-83af-da3510419b90");
         const departmentIdList = user.userDepartmentsResponse.map(department => department.departmentId);
         localStorage.setItem("user-department-id-list", JSON.stringify(departmentIdList));
         localStorage.setItem("user-data", JSON.stringify(user));
@@ -654,14 +655,23 @@ export const companyService = {
 
   createCompany: async (companyData) => {
     try {
-      const response = await api.post("/api/v1/Tenant", companyData);
+      console.log("Şirket ekleme API çağrısı, gönderilen veri:", companyData);
+      const response = await api.post("/api/v1/Tenant", companyData, {
+        headers: {
+          "Content-Type": "application/json; Version=1.0"
+        }
+      });
+      console.log("Şirket ekleme başarılı, API yanıtı:", response);
       return response;
     } catch (error) {
       console.error("Şirket eklenirken hata:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
       throw error;
     }
   },
-
   
   updateCompany: async (companyId, companyData) => {
     try {
@@ -669,24 +679,37 @@ export const companyService = {
       if (!userId) {
         throw new Error("Kullanıcı ID'si bulunamadı");
       }
-      const response = await api.put(`/api/v1/Tenant/Update?UserId=${userId}&TenantId=${companyId}`, companyData);
+      console.log("Şirket güncelleme API çağrısı, gönderilen veri:", companyData);
+      const response = await api.put(`/api/v1/Tenant`, {
+        tenantId: companyId,
+        userId: userId,
+        name: companyData.name,
+        title: companyData.title,
+        logo: companyData.logo,
+        domain: companyData.domain,
+        tenantGrupId: companyData.tenantGrupId || localStorage.getItem('tenant-grup-id') || "1160fc5a-dd69-452e-83af-da3510419b90"
+      }, {
+        headers: {
+          "Content-Type": "application/json; Version=1.0"
+        }
+      });
       return response.data;
     } catch (error) {
       console.error("Şirket güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
       throw error;
     }
   },
 
   deleteCompany: async (companyId) => {
     try {
-      const userId = localStorage.getItem('user-id');
-      if (!userId) {
-        throw new Error("Kullanıcı ID'si bulunamadı");
-      }
-      const response = await api.delete(`/api/v1/Tenant/Delete?UserId=${userId}&TenantId=${companyId}`);
+      const response = await api.delete(`/api/v1/Tenant?TenantId=${companyId}`); 
       return response.data;
     } catch (error) {
-      console.error("Şirket silinirken hata oluştu:", error);
+      console.log(error)
       throw error;
     }
   },
