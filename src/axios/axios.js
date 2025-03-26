@@ -75,6 +75,26 @@ export const departmentService = {
     }
   },
 
+  getDepartmentTasks: async (tenantId) => {
+    try {
+      console.log("Departman görevleri için API isteği yapılıyor...");
+      const response = await api.get(`/api/v1/Department/GroupTasksByDepartmen?TenantId=${tenantId}`);
+      console.log("Departman görevleri API yanıtı:", response.data);
+
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Departman görevleri API yanıtı geçersiz format:", response.data);
+        return [];
+      }
+    } catch (error) {
+      console.error("Departman görevleri alınırken hata oluştu:", error);
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      return [];
+    }
+  },
+
   updateDepartment: async (departmentId, departmentData) => {
     try {
       console.log("Departman güncelleme başlatılıyor, gönderilen veri:", {

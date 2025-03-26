@@ -12,7 +12,8 @@ import {
     faBell,
     faBuilding,
     faSave,
-    faBuildingUser
+    faBuildingUser,
+    faUserGear
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/Navbar.css';
 import '../styles/Cards.css';
@@ -238,6 +239,50 @@ function Navbar({ setIsOpen, isOpen }) {
         if (window.innerWidth < 768) setIsOpen(false);
     };
 
+    const handleDepartmentTasks = () => {
+        navigate("/DepartmentTasksPage");
+        setActivePage("departmentTasks");
+        if (window.innerWidth < 768) setIsOpen(false);
+    };
+
+    const handlePersonnelTasks = () => {
+        navigate("/PersonnelTasksPage");
+        setActivePage("personnelTasks");
+        if (window.innerWidth < 768) setIsOpen(false);
+    };
+
+    // Görevler dropdown'ı içindeki içerik
+    const tasksDropdownContent = (
+        <AnimatePresence>
+            {tasksDropdownOpen && (
+                <motion.div
+                    className="tasks-dropdown-content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <div 
+                        className={`dropdown-item ${activePage === "departmentTasks" ? "active" : ""}`}
+                        onClick={handleDepartmentTasks}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                        <FontAwesomeIcon icon={faClipboardUser} style={{ marginRight: '8px' }} />
+                        <span>Departman Görevleri</span>
+                    </div>
+                    <div 
+                        className={`dropdown-item ${activePage === "personnelTasks" ? "active" : ""}`}
+                        onClick={handlePersonnelTasks}
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                        <FontAwesomeIcon icon={faUserGear} style={{ marginRight: '8px' }} />
+                        <span>Personel Görevleri</span>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+
     return (
         <div>
             <div className="navbar">
@@ -360,22 +405,7 @@ function Navbar({ setIsOpen, isOpen }) {
                             />
                         </div>
 
-                        <AnimatePresence>
-                            {tasksDropdownOpen && (
-                                <motion.div
-                                    className="tasks-dropdown-content"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <div className="dropdown-item" style={{ display: 'flex', alignItems: 'center' }}>
-                                        <FontAwesomeIcon icon={faClipboardUser} style={{ marginRight: '8px' }} />
-                                        <span>Görevlerim</span>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        {tasksDropdownContent}
                     </motion.div>
                 )}
 

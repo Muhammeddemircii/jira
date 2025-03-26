@@ -16,6 +16,8 @@ import AnnualLeavesPage from './pages/AnnualLeavesPage';
 import NotificationsPage from './pages/Notifications/NotificationsPage';
 import NotificationsSettingsPage from './pages/Notifications/NotificationsSettingsPage';
 import CompaniesPage from './pages/CompaniesPage';
+import DepartmentTasksPage from './pages/DepartmentTasksPage';
+import PersonnelTasksPage from './pages/PersonnelTasksPage';
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -52,6 +54,8 @@ function AppContent() {
         <Route path="/NotificationsPage" element={<NotificationsPage />} />
         <Route path="/NotificationsSettingsPage" element={<NotificationsSettingsPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/DepartmentTasksPage" element={<DepartmentTasksPage />} />
+        <Route path="/PersonnelTasksPage" element={<PersonnelTasksPage />} />
       </Routes>
     </BrowserRouter>
   );
