@@ -14,7 +14,8 @@ import {
     IconButton, 
     Box,
     CircularProgress,
-    Tooltip
+    Tooltip,
+    Chip
 } from '@mui/material';
 import EditTaskTypeModal from './EditTaskTypeModal';
 import { toast } from 'react-hot-toast';
@@ -132,7 +133,7 @@ function TaskTypeTable() {
 
     if (!taskTypes || taskTypes.length === 0) {
         return (
-            <Box sx={{ padding: '30px', textAlign: 'center' }}>
+            <Box sx={{ padding: '30px', textAlign: 'center', backgroundColor: 'white', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)' }}>
                 <Typography variant="body1" color="text.secondary">
                     Henüz hiç kategori eklenmemiş. "Kategori Ekle" butonunu kullanarak yeni bir kategori ekleyebilirsiniz.
                 </Typography>
@@ -141,33 +142,56 @@ function TaskTypeTable() {
     }
 
     return (
-        <Paper sx={{ borderRadius: '10px', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)', overflow: 'hidden', width: '100%' }}>
-            <Typography variant="h6" sx={{ padding: '16px 20px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #eee', fontWeight: 600, color: '#333', fontSize: '16px' }}>
-                Kategoriler ({taskTypes.length})
-            </Typography>
-            
-            <TableContainer>
-                <Table stickyHeader size="small">
+        <Paper sx={{ borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)', overflow: 'hidden', width: '100%' }}>
+            <TableContainer sx={{ maxHeight: 'calc(100vh - 320px)' }}>
+                <Table stickyHeader>
                     <TableHead>
-                        <TableRow>
-                            <TableCell width="8%">#</TableCell>
-                            <TableCell width="42%">Adı</TableCell>
-                            <TableCell width="25%">Departman</TableCell>
-                            <TableCell width="25%" align="right">İşlemler</TableCell>
+                        <TableRow sx={{ backgroundColor: 'white' }}>
+                            <TableCell width="8%" sx={{ fontWeight: 600, color: '#555', backgroundColor: 'white', borderBottom: '2px solid rgba(32, 180, 148, 0.2)' }}>#</TableCell>
+                            <TableCell width="42%" sx={{ fontWeight: 600, color: '#555', backgroundColor: 'white', borderBottom: '2px solid rgba(32, 180, 148, 0.2)' }}>Adı</TableCell>
+                            <TableCell width="25%" sx={{ fontWeight: 600, color: '#555', backgroundColor: 'white', borderBottom: '2px solid rgba(32, 180, 148, 0.2)' }}>Departman</TableCell>
+                            <TableCell width="25%" align="right" sx={{ fontWeight: 600, color: '#555', backgroundColor: 'white', borderBottom: '2px solid rgba(32, 180, 148, 0.2)' }}>İşlemler</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {taskTypes.map((taskType, index) => (
                             <TableRow 
                                 key={taskType.id}
-                                sx={{ '&:hover': { backgroundColor: '#f8f9fa' }, transition: 'background-color 0.2s ease' }}
+                                sx={{ 
+                                    '&:hover': { backgroundColor: 'rgba(32, 180, 148, 0.03)' }, 
+                                    transition: 'background-color 0.2s ease',
+                                    backgroundColor: index % 2 === 0 ? 'white' : 'rgba(250, 250, 250, 0.7)'
+                                }}
                             >
-                                <TableCell>{index + 1}</TableCell>
+                                <TableCell sx={{ fontSize: '14px', color: '#666' }}>
+                                    <Chip 
+                                        label={index + 1} 
+                                        size="small" 
+                                        sx={{ 
+                                            height: '24px', 
+                                            minWidth: '24px',
+                                            fontSize: '12px',
+                                            fontWeight: 500,
+                                            color: '#555',
+                                            backgroundColor: 'rgba(32, 180, 148, 0.1)'
+                                        }} 
+                                    />
+                                </TableCell>
                                 <TableCell sx={{ fontWeight: 500, color: '#333', fontSize: '14px' }}>
                                     {taskType.name}
                                 </TableCell>
                                 <TableCell>
-                                    {taskType.departmentName || 'Belirtilmemiş'}
+                                    <Chip 
+                                        label={taskType.departmentName || 'Belirtilmemiş'} 
+                                        size="small"
+                                        sx={{ 
+                                            bgcolor: 'rgba(32, 180, 148, 0.07)',
+                                            color: '#20b494',
+                                            fontWeight: 500,
+                                            fontSize: '12px',
+                                            border: '1px solid rgba(32, 180, 148, 0.2)'
+                                        }}
+                                    />
                                 </TableCell>
                                 <TableCell align="right" sx={{ whiteSpace: 'nowrap', minWidth: '120px' }}>
                                     <Tooltip title="Düzenle">
@@ -176,7 +200,7 @@ function TaskTypeTable() {
                                             size="small"
                                             sx={{ 
                                                 color: '#20b494', 
-                                                marginRight: '2px', 
+                                                marginRight: '8px', 
                                                 padding: '6px',
                                                 backgroundColor: 'rgba(32, 180, 148, 0.1)',
                                                 '&:hover': { backgroundColor: 'rgba(32, 180, 148, 0.2)' }
@@ -192,7 +216,6 @@ function TaskTypeTable() {
                                             size="small"
                                             sx={{ 
                                                 color: '#e74c3c', 
-                                                marginRight: '2px', 
                                                 padding: '6px',
                                                 backgroundColor: 'rgba(231, 76, 60, 0.1)',
                                                 '&:hover': { backgroundColor: 'rgba(231, 76, 60, 0.2)' }

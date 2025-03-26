@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Typography, useMediaQuery } from '@mui/material';
+import { Button, Typography, useMediaQuery, Box, Paper } from '@mui/material';
 import DepartmentTable from './DepartmentTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
 import EditDepartmentModal from '../Departments/EditDepartmentModal';
 import AddDepartment from './AddDepartment';
 
@@ -21,25 +21,57 @@ function DepartmentButton() {
     };
 
     return (
-        <div>
-            <div className="department-header">
-                <Typography variant="h1">{isMobile ? "Departmanlar" : "Departman Yönetimi"}</Typography>
+        <Box sx={{ width: '96%', maxWidth: '1400px', margin: '0 auto' }}>
+            <Paper 
+                elevation={0} 
+                sx={{ 
+                    p: 2, 
+                    mb: 2, 
+                    borderRadius: '12px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(32, 180, 148, 0.08)',
+                    border: '1px solid rgba(32, 180, 148, 0.2)'
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <FontAwesomeIcon 
+                        icon={faUsers} 
+                        style={{ 
+                            fontSize: '24px', 
+                            color: '#20b494',
+                            padding: '12px',
+                            backgroundColor: 'rgba(32, 180, 148, 0.1)',
+                            borderRadius: '50%'
+                        }} 
+                    />
+                    <Typography variant="h6" fontWeight={600}>
+                        {isMobile ? "Departmanlar" : "Departman Yönetimi"}
+                    </Typography>
+                </Box>
+                
                 <Button
                     onClick={handleAddDepartment}
                     variant="contained"
                     disabled={loadingDepartmentButton}
-                    className="department-add-button"
-                    size={isMobile ? "small" : "medium"}
+                    startIcon={
+                        <FontAwesomeIcon
+                            icon={loadingDepartmentButton ? faSpinner : faPlus}
+                            spin={loadingDepartmentButton}
+                        />
+                    }
+                    sx={{ 
+                        bgcolor: "#20b494",
+                        '&:hover': {
+                            bgcolor: "#18a085"
+                        },
+                        px: 3
+                    }}
                 >
-                    <FontAwesomeIcon
-                        className="icon-margin"
-                        icon={loadingDepartmentButton ? faSpinner : faPlus}
-                        spin={loadingDepartmentButton}
-                        style={{ marginRight: '8px' }}
-                    />
                     {loadingDepartmentButton ? "Ekleniyor..." : isMobile ? "Ekle" : "Departman Ekle"}
                 </Button>
-            </div>
+            </Paper>
             
             <DepartmentTable />
 
@@ -50,7 +82,7 @@ function DepartmentButton() {
             )}
             
             <EditDepartmentModal />
-        </div>
+        </Box>
     );
 }
 

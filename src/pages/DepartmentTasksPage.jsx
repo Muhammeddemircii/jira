@@ -9,6 +9,8 @@ import {
 import { departmentService } from '../axios/axios';
 import '../styles/Departments/DepartmentTasks.css';
 import Navbar from '../components/Navbar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faListCheck } from '@fortawesome/free-solid-svg-icons';
 
 // For charts
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip as ChartTooltip, Cell } from 'recharts';
@@ -63,13 +65,38 @@ function DepartmentTasksPage() {
 
   return (
     <div className="department-tasks-page">
-   
-      <div className={`department-tasks-container ${isOpen ? 'menu-open' : ''}`}>   <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
-        <div className="header-container">
-          <Typography variant="h4" component="h1" className="page-title">
-            Departman Görevleri
-          </Typography>
-        </div>
+    
+      <div className={`department-tasks-container ${isOpen ? 'menu-open' : ''}`}>  <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
+        <Box sx={{ width: '96%', maxWidth: '1400px', margin: '0 auto', mb: 3 }}>
+          <Paper 
+            elevation={0} 
+            sx={{ 
+                p: 2, 
+                mb: 2, 
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'rgba(32, 180, 148, 0.08)',
+                border: '1px solid rgba(32, 180, 148, 0.2)'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <FontAwesomeIcon 
+                    icon={faListCheck} 
+                    style={{ 
+                        fontSize: '24px', 
+                        color: '#20b494',
+                        padding: '12px',
+                        backgroundColor: 'rgba(32, 180, 148, 0.1)',
+                        borderRadius: '50%'
+                    }} 
+                />
+                <Typography variant="h6" fontWeight={600}>
+                    Departman Görevleri
+                </Typography>
+            </Box>
+          </Paper>
+        </Box>
 
         {loading ? (
           <Box className="loading-container">
