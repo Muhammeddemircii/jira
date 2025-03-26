@@ -309,10 +309,23 @@ function Navbar({ setIsOpen, isOpen }) {
                     <FontAwesomeIcon icon={faUserCircle} />
                     <h5>Personeller</h5>
                 </motion.div>
+                {isGroupManager && (
+                    <motion.div
+                        custom={2}
+                        variants={navItemsVariants}
+                        initial="hidden"
+                        animate={isOpen ? "visible" : "hidden"}
+                        className={`icon-pano-container ${activePage === "companies" ? "active" : ""}`}
+                        onClick={handleCompanies}
+                    >
+                        <FontAwesomeIcon icon={faBuildingUser} />
+                        <h5>Şirketler</h5>
+                    </motion.div>
+                )}
 
                 {!isPersonnel && (
                     <motion.div
-                        custom={2}
+                        custom={3}
                         variants={navItemsVariants}
                         initial="hidden"
                         animate={isOpen ? "visible" : "hidden"}
@@ -326,7 +339,7 @@ function Navbar({ setIsOpen, isOpen }) {
 
                 {!isPersonnel && (
                     <motion.div
-                        custom={3}
+                        custom={4}
                         variants={navItemsVariants}
                         initial="hidden"
                         animate={isOpen ? "visible" : "hidden"}
@@ -368,7 +381,7 @@ function Navbar({ setIsOpen, isOpen }) {
 
                 {!isPersonnel && (
                     <motion.div
-                        custom={4}
+                        custom={5}
                         variants={navItemsVariants}
                         initial="hidden"
                         animate={isOpen ? "visible" : "hidden"}
@@ -413,7 +426,7 @@ function Navbar({ setIsOpen, isOpen }) {
                 )}
 
                 <motion.div
-                    custom={5}
+                    custom={6}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
@@ -461,7 +474,7 @@ function Navbar({ setIsOpen, isOpen }) {
 
                 {/* Bildirimler kısmı */}
                 <motion.div
-                    custom={6}
+                    custom={7}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
@@ -522,7 +535,7 @@ function Navbar({ setIsOpen, isOpen }) {
                 </motion.div>
 
                 <motion.div
-                    custom={7}
+                    custom={8}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
@@ -538,19 +551,7 @@ function Navbar({ setIsOpen, isOpen }) {
                     </Button>
                 </motion.div>
 
-                {isGroupManager && (
-                    <motion.div
-                        custom={8}
-                        variants={navItemsVariants}
-                        initial="hidden"
-                        animate={isOpen ? "visible" : "hidden"}
-                        className={`icon-pano-container ${activePage === "companies" ? "active" : ""}`}
-                        onClick={handleCompanies}
-                    >
-                        <FontAwesomeIcon icon={faBuildingUser} />
-                        <h5>Şirketler</h5>
-                    </motion.div>
-                )}
+
             </motion.nav>
 
             <div className={`navbar-toggle ${isOpen ? "open" : ""}`}>
