@@ -634,4 +634,77 @@ export const overTimeServices = {
     }
   }
 }
+
+export const companyService = {
+  getCompanies: async () => {
+    try {
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      }
+      const response = await api.get(`/api/v1/Tenant/GetByTenantGrup?UserId=${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Şirket verileri alınırken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  addCompany: async (companyData) => {
+    try {
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      }
+      const response = await api.post(`/api/v1/Tenant/Create?UserId=${userId}`, companyData);
+      return response.data;
+    } catch (error) {
+      console.error("Şirket eklenirken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  updateCompany: async (companyId, companyData) => {
+    try {
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      }
+      const response = await api.put(`/api/v1/Tenant/Update?UserId=${userId}&TenantId=${companyId}`, companyData);
+      return response.data;
+    } catch (error) {
+      console.error("Şirket güncellenirken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  deleteCompany: async (companyId) => {
+    try {
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      }
+      const response = await api.delete(`/api/v1/Tenant/Delete?UserId=${userId}&TenantId=${companyId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Şirket silinirken hata oluştu:", error);
+      throw error;
+    }
+  },
+
+  getCompanyUsers: async (companyId) => {
+    try {
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      }
+      const response = await api.get(`/api/v1/Tenant/GetUsers?UserId=${userId}&TenantId=${companyId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Şirket kullanıcıları alınırken hata oluştu:", error);
+      throw error;
+    }
+  }
+};
+
 export default api;

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import Navbar from '../components/Navbar';
+import Navbar from '../../components/Navbar';
 import { motion } from 'framer-motion';
 import { Box, Paper, Typography, Divider, List, ListItem, ListItemIcon, ListItemText, ListItemButton, Badge } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

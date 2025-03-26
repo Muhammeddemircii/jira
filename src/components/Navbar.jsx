@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { 
-  faBars, 
-  faChevronDown, 
-  faClipboardUser, 
-  faSolarPanel, 
-  faUserCircle, 
-  faTasks, 
-  faCog, 
-  faBell, 
-  faBuilding,
-  faSave
+import {
+    faBars,
+    faChevronDown,
+    faClipboardUser,
+    faSolarPanel,
+    faUserCircle,
+    faTasks,
+    faCog,
+    faBell,
+    faBuilding,
+    faSave,
+    faBuildingUser
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/Navbar.css';
 import '../styles/Cards.css';
@@ -34,6 +35,7 @@ function Navbar({ setIsOpen, isOpen }) {
     const [isEditing, setIsEditing] = useState(false);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
     const [isPersonnel, setIsPersonnel] = useState(false);
+    const [isGroupManager, setIsGroupManager] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -43,9 +45,10 @@ function Navbar({ setIsOpen, isOpen }) {
         setName(localStorage.getItem("user-name") || "Misafir");
         setTenantName(localStorage.getItem("tenant-name") || "Yükleniyor...");
         const userRole = localStorage.getItem("user-role") || "Yükleniyor...";
+        const userTypeId = localStorage.getItem("user-type-id");
         setRoleName(userRole);
         setIsPersonnel(userRole.toLowerCase() === "personel");
-        
+        setIsGroupManager(userTypeId === "4");
 
         setTimeout(() => {
             setShowWelcome(true);
@@ -68,6 +71,8 @@ function Navbar({ setIsOpen, isOpen }) {
             setActivePage("taskType");
         } else if (path.includes("/NotificationsPage")) {
             setActivePage("notifications");
+        } else if (path.includes("/companies")) {
+            setActivePage("companies");
         }
     }, [location]);
 
@@ -75,7 +80,14 @@ function Navbar({ setIsOpen, isOpen }) {
     useEffect(() => {
         if (isPersonnel) {
             const path = location.pathname;
-            const authorizedPaths = ["/HomePage", "/StaffPage", "/ProfilePage", "/NotificationsPage"];
+            const authorizedPaths = [
+                "/HomePage", 
+                "/StaffPage", 
+                "/ProfilePage", 
+                "/NotificationsPage", 
+                "/NotificationsSettingsPage",
+                "/AnnualLeavesPage"
+            ];
             
             // Check if current path is not authorized
             const isAuthorized = authorizedPaths.some(authorizedPath => path.includes(authorizedPath));
@@ -125,31 +137,37 @@ function Navbar({ setIsOpen, isOpen }) {
         setActivePage("profile");
         if (window.innerWidth < 768) setIsOpen(false);
     }
-    
+
     const handleNotifications = () => {
         navigate("/NotificationsPage");
         setActivePage("notifications");
         if (window.innerWidth < 768) setIsOpen(false);
     }
-    
+
+    const handleNotificationsSettings = () => {
+        navigate("/NotificationsSettingsPage");
+        setActivePage("notificationsSettings");
+        if (window.innerWidth < 768) setIsOpen(false);
+    }
+
     const handleAnnualLeave = () => {
         const id = localStorage.getItem("user-id"); // Kullanıcı ID'sini localStorage'dan al
         if (!id) {
             console.error("Hata: Kullanıcı ID bulunamadı!");
             return;
         }
-    
+
         navigate(`/AnnualLeavesPage/${id}`);
         setActivePage("annualLeaves");
-    
+
         if (window.innerWidth < 768) setIsOpen(false);
     };
-    
+
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
     const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
     const toggleNotificationsDropdown = () => setNotificationsDropdownOpen(!notificationsDropdownOpen);
-    
+
     const navItemsVariants = {
         hidden: { opacity: 0, x: -20 },
         visible: (i) => ({
@@ -162,11 +180,11 @@ function Navbar({ setIsOpen, isOpen }) {
             }
         })
     };
-    
+
     const dropdownVariants = {
         hidden: { opacity: 0, height: 0 },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             height: "auto",
             transition: {
                 duration: 0.3,
@@ -176,16 +194,16 @@ function Navbar({ setIsOpen, isOpen }) {
             }
         }
     };
-    
+
     const dropdownItemVariants = {
         hidden: { opacity: 0, x: -10 },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             x: 0,
             transition: { duration: 0.3 }
         }
     };
-    
+
     // Function to handle save
     const handleSave = () => {
         // Save changes logic here
@@ -193,13 +211,13 @@ function Navbar({ setIsOpen, isOpen }) {
         // You would typically call your API or dispatch an action here
         alert("Changes saved successfully!");
     };
-    
+
 
     const startEditing = () => {
         setIsEditing(true);
         setHasUnsavedChanges(true);
     };
-    
+
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
@@ -209,11 +227,17 @@ function Navbar({ setIsOpen, isOpen }) {
                 return e.returnValue;
             }
         };
-        
+
         window.addEventListener("beforeunload", handleBeforeUnload);
         return () => window.removeEventListener("beforeunload", handleBeforeUnload);
     }, [hasUnsavedChanges]);
-    
+
+    const handleCompanies = () => {
+        navigate("/companies");
+        setActivePage("companies");
+        if (window.innerWidth < 768) setIsOpen(false);
+    };
+
     return (
         <div>
             <div className="navbar">
@@ -225,9 +249,9 @@ function Navbar({ setIsOpen, isOpen }) {
                 >
                     <p>LedAsistan'a Hoşgeldiniz, {name}</p>
                 </motion.div>
-                
+
                 {hasUnsavedChanges && (
-                    <motion.div 
+                    <motion.div
                         className="save-button"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -261,9 +285,9 @@ function Navbar({ setIsOpen, isOpen }) {
                 </motion.div>
 
                 <hr />
-                
-                <motion.div 
-                    custom={0} 
+
+                <motion.div
+                    custom={0}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
@@ -274,8 +298,8 @@ function Navbar({ setIsOpen, isOpen }) {
                     <h5>Pano</h5>
                 </motion.div>
 
-                <motion.div 
-                    custom={1} 
+                <motion.div
+                    custom={1}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
@@ -287,115 +311,115 @@ function Navbar({ setIsOpen, isOpen }) {
                 </motion.div>
 
                 {!isPersonnel && (
-                <motion.div 
-                    custom={2} 
-                    variants={navItemsVariants}
-                    initial="hidden"
-                    animate={isOpen ? "visible" : "hidden"}
-                    className={`icon-pano-container ${activePage === "department" ? "active" : ""}`}
-                    onClick={handleDepartment}
-                >
-                    <FontAwesomeIcon icon={faBuilding} />
-                    <h5>Departman</h5>
-                </motion.div>
+                    <motion.div
+                        custom={2}
+                        variants={navItemsVariants}
+                        initial="hidden"
+                        animate={isOpen ? "visible" : "hidden"}
+                        className={`icon-pano-container ${activePage === "department" ? "active" : ""}`}
+                        onClick={handleDepartment}
+                    >
+                        <FontAwesomeIcon icon={faBuilding} />
+                        <h5>Departman</h5>
+                    </motion.div>
                 )}
 
                 {!isPersonnel && (
-                <motion.div 
-                    custom={3} 
-                    variants={navItemsVariants}
-                    initial="hidden"
-                    animate={isOpen ? "visible" : "hidden"}
-                    className="tasks-dropdown"
-                >
-                    <div 
-                        className="icon-pano-container"
-                        onClick={() => setTasksDropdownOpen(!tasksDropdownOpen)}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                    <motion.div
+                        custom={3}
+                        variants={navItemsVariants}
+                        initial="hidden"
+                        animate={isOpen ? "visible" : "hidden"}
+                        className="tasks-dropdown"
                     >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <FontAwesomeIcon icon={faTasks} />
-                            <h5>Görevler</h5>
+                        <div
+                            className="icon-pano-container"
+                            onClick={() => setTasksDropdownOpen(!tasksDropdownOpen)}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <FontAwesomeIcon icon={faTasks} />
+                                <h5>Görevler</h5>
+                            </div>
+                            <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className={`arrow-icon ${tasksDropdownOpen ? 'open' : ''}`}
+                            />
                         </div>
-                        <FontAwesomeIcon 
-                            icon={faChevronDown} 
-                            className={`arrow-icon ${tasksDropdownOpen ? 'open' : ''}`}
-                        />
-                    </div>
-                    
-                    <AnimatePresence>
-                        {tasksDropdownOpen && (
-                            <motion.div 
-                                className="tasks-dropdown-content"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <div className="dropdown-item" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <FontAwesomeIcon icon={faClipboardUser} style={{ marginRight: '8px' }} />
-                                    <span>Görevlerim</span>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
-                )}
 
-                {!isPersonnel && (
-                <motion.div 
-                    custom={4} 
-                    variants={navItemsVariants}
-                    initial="hidden"
-                    animate={isOpen ? "visible" : "hidden"}
-                    className="tasks-dropdown"
-                >
-                    <div 
-                        className="icon-pano-container"
-                        onClick={() => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen)}
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <FontAwesomeIcon icon={faCog} />
-                            <h5>Görev Ayarları</h5>
-                        </div>
-                        <FontAwesomeIcon 
-                            icon={faChevronDown} 
-                            className={`arrow-icon ${taskSettingsDropdownOpen ? 'open' : ''}`}
-                        />
-                    </div>
-                    
-                    <AnimatePresence>
-                        {taskSettingsDropdownOpen && (
-                            <motion.div 
-                                className="tasks-dropdown-content"
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <div 
-                                    className={`dropdown-item ${activePage === "taskType" ? "active" : ""}`}
-                                    onClick={handleTaskType}
-                                    style={{ display: 'flex', alignItems: 'center' }}
+                        <AnimatePresence>
+                            {tasksDropdownOpen && (
+                                <motion.div
+                                    className="tasks-dropdown-content"
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
                                 >
-                                    <FontAwesomeIcon icon={faTasks} style={{ marginRight: '8px' }} />
-                                    <span>Kategoriler</span>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
+                                    <div className="dropdown-item" style={{ display: 'flex', alignItems: 'center' }}>
+                                        <FontAwesomeIcon icon={faClipboardUser} style={{ marginRight: '8px' }} />
+                                        <span>Görevlerim</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                 )}
 
-                <motion.div 
-                    custom={5} 
+                {!isPersonnel && (
+                    <motion.div
+                        custom={4}
+                        variants={navItemsVariants}
+                        initial="hidden"
+                        animate={isOpen ? "visible" : "hidden"}
+                        className="tasks-dropdown"
+                    >
+                        <div
+                            className="icon-pano-container"
+                            onClick={() => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen)}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <FontAwesomeIcon icon={faCog} />
+                                <h5>Görev Ayarları</h5>
+                            </div>
+                            <FontAwesomeIcon
+                                icon={faChevronDown}
+                                className={`arrow-icon ${taskSettingsDropdownOpen ? 'open' : ''}`}
+                            />
+                        </div>
+
+                        <AnimatePresence>
+                            {taskSettingsDropdownOpen && (
+                                <motion.div
+                                    className="tasks-dropdown-content"
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <div
+                                        className={`dropdown-item ${activePage === "taskType" ? "active" : ""}`}
+                                        onClick={handleTaskType}
+                                        style={{ display: 'flex', alignItems: 'center' }}
+                                    >
+                                        <FontAwesomeIcon icon={faTasks} style={{ marginRight: '8px' }} />
+                                        <span>Kategoriler</span>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                )}
+
+                <motion.div
+                    custom={5}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
                     className="tasks-dropdown"
                 >
-                    <div 
+                    <div
                         className="icon-pano-container"
                         onClick={toggleProfileDropdown}
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -404,8 +428,8 @@ function Navbar({ setIsOpen, isOpen }) {
                             <FontAwesomeIcon icon={faUserCircle} />
                             <h5>Profil</h5>
                         </div>
-                        <FontAwesomeIcon 
-                            icon={faChevronDown} 
+                        <FontAwesomeIcon
+                            icon={faChevronDown}
                             className={`arrow-icon ${profileDropdownOpen ? 'open' : ''}`}
                         />
                     </div>
@@ -427,23 +451,23 @@ function Navbar({ setIsOpen, isOpen }) {
                                 Yıllık İzinler
                             </motion.div>
                             {!isPersonnel && (
-                            <motion.div variants={dropdownItemVariants} className="dropdown-item">
-                                Mesailer
-                            </motion.div>
+                                <motion.div variants={dropdownItemVariants} className="dropdown-item">
+                                    Mesailer
+                                </motion.div>
                             )}
                         </motion.div>
                     )}
                 </AnimatePresence>
-                
+
                 {/* Bildirimler kısmı */}
-                <motion.div 
-                    custom={6} 
+                <motion.div
+                    custom={6}
                     variants={navItemsVariants}
                     initial="hidden"
                     animate={isOpen ? "visible" : "hidden"}
                     className="tasks-dropdown"
                 >
-                    <div 
+                    <div
                         className="icon-pano-container"
                         onClick={toggleNotificationsDropdown}
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -452,34 +476,51 @@ function Navbar({ setIsOpen, isOpen }) {
                             <FontAwesomeIcon icon={faBell} />
                             <h5>Bildirimler</h5>
                         </div>
-                        <FontAwesomeIcon 
-                            icon={faChevronDown} 
+                        <FontAwesomeIcon
+                            icon={faChevronDown}
                             className={`arrow-icon ${notificationsDropdownOpen ? 'open' : ''}`}
                         />
                     </div>
-                    
+
                     <AnimatePresence>
                         {notificationsDropdownOpen && (
-                            <motion.div 
+                            <div>  <motion.div
                                 className="tasks-dropdown-content"
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                <div 
+                                <div
                                     className={`dropdown-item ${activePage === "notifications" ? "active" : ""}`}
                                     onClick={handleNotifications}
                                     style={{ display: 'flex', alignItems: 'center' }}
                                 >
                                     <FontAwesomeIcon icon={faBell} style={{ marginRight: '8px' }} />
                                     <span>Tüm Bildirimler</span>
+
                                 </div>
                             </motion.div>
+                                <motion.div
+                                    className="tasks-dropdown-content"
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <div
+                                        className={`dropdown-item ${activePage === "notifications" ? "active" : ""}`}
+                                        onClick={handleNotificationsSettings}
+                                        style={{ display: 'flex', alignItems: 'center' }}
+                                    >
+                                        <FontAwesomeIcon icon={faBell} style={{ marginRight: '8px' }} />
+                                        <span>Bildirim Ayarları</span>
+                                    </div>
+                                </motion.div></div>
                         )}
                     </AnimatePresence>
                 </motion.div>
-                
+
                 <motion.div
                     custom={7}
                     variants={navItemsVariants}
@@ -496,6 +537,20 @@ function Navbar({ setIsOpen, isOpen }) {
                         Çıkış Yap
                     </Button>
                 </motion.div>
+
+                {isGroupManager && (
+                    <motion.div
+                        custom={8}
+                        variants={navItemsVariants}
+                        initial="hidden"
+                        animate={isOpen ? "visible" : "hidden"}
+                        className={`icon-pano-container ${activePage === "companies" ? "active" : ""}`}
+                        onClick={handleCompanies}
+                    >
+                        <FontAwesomeIcon icon={faBuildingUser} />
+                        <h5>Şirketler</h5>
+                    </motion.div>
+                )}
             </motion.nav>
 
             <div className={`navbar-toggle ${isOpen ? "open" : ""}`}>
@@ -503,14 +558,14 @@ function Navbar({ setIsOpen, isOpen }) {
                     onClick={toggleMenu}
                     initial={{ scale: 1 }}
                     whileTap={{ scale: 0.9 }}
-                    animate={{ 
+                    animate={{
                         scale: isOpen ? 1.1 : 1,
                         rotate: isOpen ? 180 : 0
                     }}
-                    transition={{ 
-                        type: "spring", 
-                        stiffness: 300, 
-                        damping: 20 
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20
                     }}
                 >
                     <FontAwesomeIcon icon={faBars} className="navbar-toogle-fontawesomeicon" />
