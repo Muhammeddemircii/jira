@@ -3,6 +3,9 @@ import Navbar from '../components/Navbar'
 import { overTimeServices } from '../axios/axios';
 import { useParams } from 'react-router-dom';
 import '../styles/OvertimePage.css';
+import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
+import { Tooltip, IconButton } from '@mui/material';
 
 function OvertimePage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,8 +15,10 @@ function OvertimePage() {
     entryTime: '',
     exitTime: ''
   });
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
   
-  const id = useParams();
+  const { id } = useParams(); // Destructured correctly
   
   const updateMenuState = useCallback((newState) => {
     setIsOpen(newState);
@@ -21,9 +26,14 @@ function OvertimePage() {
 
   useEffect(() => {
     const fetchOvertimeServices = async () => {
-      const response = await overTimeServices.getOverTimeServices(id);
-      if(response && response.data){
-        setOvertimes(response.data);
+      try {
+        const response = await overTimeServices.getOverTimeServices();
+        if(response && response.data){
+          setOvertimes(response.data);
+        }
+      } catch (error) {
+        console.error('Mesai kayıtları yüklenirken hata:', error);
+        alert('Mesai kayıtları yüklenemedi.');
       }
     }
     fetchOvertimeServices();
@@ -37,25 +47,79 @@ function OvertimePage() {
     });
   };
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Add your submission logic here
-    // For example: await overTimeServices.createOverTime(formData);
-    
-    setShowForm(false);
+  const handleEdit = (overtime) => {
+    setEditMode(true);
+    setEditId(overtime.id);
     setFormData({
-      entryTime: '',
-      exitTime: ''
+      entryTime: overtime.entryTime ? overtime.entryTime.substring(0, 16) : '', // Format for datetime-local
+      exitTime: overtime.exitTime ? overtime.exitTime.substring(0, 16) : ''     // Format for datetime-local
     });
-    
-    // Refetch data after submit
-    const response = await overTimeServices.getOverTimeServices(id);
-    if(response && response.data){
-      setOvertimes(response.data);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const handleDelete = async (id) => {
+    if (window.confirm('Bu mesai kaydını silmek istediğinize emin misiniz?')) {
+      try {
+        await overTimeServices.deleteOvertime(id);
+        
+        // Refresh overtime list
+        const updatedOvertimes = await overTimeServices.getOverTimeServices();
+        if (updatedOvertimes && updatedOvertimes.data) {
+          setOvertimes(updatedOvertimes.data);
+        }
+        
+        alert('Mesai kaydı başarıyla silindi.');
+      } catch (error) {
+        console.error('Mesai kaydı silinirken hata oluştu:', error);
+        alert('Mesai kaydı silinirken bir hata oluştu.');
+      }
     }
   };
   
-  // Helper function to calculate duration between entry and exit times
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Prepare the overtime data for submission
+      const overtimeData = {
+        userId: localStorage.getItem('user-id'), // Get user ID from local storage
+        entryTime: formData.entryTime,
+        exitTime: formData.exitTime
+      };
+
+      if (editMode && editId) {
+        // Update existing overtime
+        await overTimeServices.updateOvertime(editId, overtimeData);
+
+      } else {
+        // Create new overtime
+        await overTimeServices.createOvertime(overtimeData);
+
+      }
+
+      // Reset form state
+      setShowForm(false);
+      setFormData({
+        entryTime: '',
+        exitTime: ''
+      });
+      setEditMode(false);
+      setEditId(null);
+
+      // Refresh the overtime list
+      const updatedOvertimes = await overTimeServices.getOverTimeServices();
+      if (updatedOvertimes && updatedOvertimes.data) {
+        setOvertimes(updatedOvertimes.data);
+      }
+
+    } catch (error) {
+      // Handle any errors during submission
+      console.error('Mesai kaydı işlemi sırasında hata oluştu:', error);
+      alert('Mesai kaydı işlemi sırasında bir hata oluştu.');
+    }
+  };
+  
   const calculateDuration = (entryTime, exitTime) => {
     if (!entryTime || !exitTime) return "N/A";
     
@@ -67,13 +131,12 @@ function OvertimePage() {
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       
-      return `${hours}h ${minutes}m`;
+      return `${hours} saat ${minutes} dakika`;
     } catch (e) {
       return "Invalid time";
     }
   };
   
-  // Helper function to format date
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -86,8 +149,7 @@ function OvertimePage() {
       return dateString;
     }
   };
-  
-  // Helper function to format time
+
   const formatTime = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -105,12 +167,24 @@ function OvertimePage() {
       <div>
         <Navbar isOpen={isOpen} setIsOpen={updateMenuState} />
         <div className="overtime-container">
-          <h1 className="overtime-header">Mesai Kayıtları</h1>
+          <div className="overtime-header-card">
+            <h1 className="overtime-header">Mesai Kayıtları</h1>
+          </div>
           
           <div className="overtime-actions">
             <button 
               className="overtime-button add" 
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                setShowForm(!showForm);
+                if (!showForm) {
+                  setEditMode(false);
+                  setEditId(null);
+                  setFormData({
+                    entryTime: '',
+                    exitTime: ''
+                  });
+                }
+              }}
             >
               {showForm ? 'İptal Et' : 'Yeni Mesai Ekle'}
             </button>
@@ -118,7 +192,7 @@ function OvertimePage() {
           
           {showForm && (
             <div className="overtime-form">
-              <h2 className="overtime-form-title">Yeni Mesai Bilgileri</h2>
+              <h2 className="overtime-form-title">{editMode ? 'Mesai Düzenle' : 'Yeni Mesai Bilgileri'}</h2>
               <form onSubmit={handleSubmit}>
                 <div className="overtime-form-row">
                   <div className="overtime-form-group">
@@ -164,6 +238,37 @@ function OvertimePage() {
                 <div key={overtime.id} className="overtime-card">
                   <div className="overtime-card-header">
                     <span className="overtime-date">{formatDate(overtime.entryTime)}</span>
+                    <div className="overtime-card-actions">
+                      <Tooltip title="Düzenle">
+                        <IconButton 
+                          size="small"
+                          onClick={() => handleEdit(overtime)}
+                          sx={{ 
+                            color: '#20b494', 
+                            marginRight: '8px', 
+                            padding: '6px',
+                            backgroundColor: 'rgba(32, 180, 148, 0.1)',
+                            '&:hover': { backgroundColor: 'rgba(32, 180, 148, 0.2)' }
+                          }}
+                        >
+                          <FaRegEdit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Sil">
+                        <IconButton 
+                          size="small"
+                          onClick={() => handleDelete(overtime.id)}
+                          sx={{ 
+                            color: '#e74c3c', 
+                            padding: '6px',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            '&:hover': { backgroundColor: 'rgba(231, 76, 60, 0.2)' }
+                          }}
+                        >
+                          <MdDeleteForever />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
                   </div>
                   <div className="overtime-times">
                     <div className="overtime-time-item">

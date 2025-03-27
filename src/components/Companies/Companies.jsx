@@ -130,7 +130,6 @@ function Companies() {
 
   const handleSubmit = async (isEdit = false) => {
     try {
-      // TenantGrupId'nin formData içinde olduğundan emin olalım
       const submitData = {
         ...formData,
         tenantGrupId: localStorage.getItem('tenant-grup-id') || '1160fc5a-dd69-452e-83af-da3510419b90'
@@ -302,7 +301,6 @@ function Companies() {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Company Dialog */}
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Şirket Düzenle</DialogTitle>
         <DialogContent>
@@ -343,7 +341,6 @@ function Companies() {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -368,7 +365,7 @@ function Companies() {
         </DialogActions>
       </Dialog>
 
-      {/* Users Dialog */}
+
       <Dialog 
         open={usersDialogOpen} 
         onClose={() => setUsersDialogOpen(false)}

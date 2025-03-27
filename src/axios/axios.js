@@ -659,6 +659,58 @@ export const overTimeServices = {
     } catch(error){
       console.log(error)
     }
+  },
+  createOvertime: async (overtimeData) => {
+    try {
+      console.log("Fazla mesai ekleme API çağrısı, gönderilen veri:", overtimeData);
+      const response = await api.post("/api/v1/Overtime", overtimeData, {
+        headers: {
+          "Content-Type": "application/json; Version=1.0"
+        }
+      });
+      console.log("Fazla mesai ekleme başarılı, API yanıtı:", response);
+      return response;
+    } catch (error) {
+      console.error("Fazla mesai eklenirken hata:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+  updateOvertime: async (overtimeId, overtimeData) => {
+    try {
+      console.log("Fazla mesai güncelleme API çağrısı, gönderilen veri:", overtimeData);
+      const response = await api.put(`/api/v1/Overtime`, {
+        id: overtimeId,
+        userId: overtimeData.userId,
+        entryTime: overtimeData.entryTime,
+        exitTime: overtimeData.exitTime
+      }, {
+        headers: {
+          "Content-Type": "application/json; Version=1.0"
+        }
+      });
+      console.log("Fazla mesai güncelleme başarılı, API yanıtı:", response);
+      return response;
+    } catch (error) {
+      console.error("Fazla mesai güncellenirken hata:", error);
+      if (error.response) {
+        console.error("API hata yanıtı:", error.response.data);
+        console.error("API hata kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+  deleteOvertime: async (overtimeId) => {
+    try {
+      const response = await api.delete(`/api/v1/Overtime?OvertimeId=${overtimeId}`);
+      return response.data;
+    } catch (error) {
+      console.log(error)
+      throw error;
+    }
   }
 }
 

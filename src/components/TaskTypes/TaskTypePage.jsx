@@ -49,7 +49,7 @@ function TaskTypePage() {
 
     const handleTaskTypeAdded = (newTaskType) => {
         setTaskTypes(prev => [...prev, newTaskType]);
-        setRefreshKey(prev => prev + 1); // Force a refresh
+        setRefreshKey(prev => prev + 1);
     };
 
     return (
@@ -64,7 +64,6 @@ function TaskTypePage() {
             }}
         >
             <Box sx={{ width: '96%', maxWidth: '1400px', margin: '0 auto' }}>
-                {/* Header Section with elegant styling */}
                 <Card 
                     elevation={3} 
                     sx={{ 
@@ -76,7 +75,6 @@ function TaskTypePage() {
                     }}
                 >
                     <CardContent sx={{ p: 0 }}>
-                        {/* Icon positioned for visual interest */}
                         <Box 
                             sx={{ 
                                 position: 'absolute', 
@@ -103,7 +101,6 @@ function TaskTypePage() {
                             />
                         </Box>
 
-                        {/* Header Content */}
                         <Box 
                             sx={{ 
                                 pt: 6, 
@@ -134,7 +131,6 @@ function TaskTypePage() {
                         
                         <Divider />
                         
-                        {/* Action Bar */}
                         <Box 
                             sx={{ 
                                 p: isMobile ? 2 : 3, 
@@ -173,8 +169,6 @@ function TaskTypePage() {
                         </Box>
                     </CardContent>
                 </Card>
-
-                {/* Table Section with improved spacing */}
                 <Box sx={{ mt: 2, borderRadius: '16px', overflow: 'hidden' }}>
                     <TaskTypeTable key={refreshKey} />
                 </Box>
