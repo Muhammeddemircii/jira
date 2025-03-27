@@ -74,8 +74,6 @@ function TaskTypeTable() {
             
             if (response && response.isSuccess) {
                 toast.success('Kategori başarıyla güncellendi!');
-                
-                // Güncellemeden sonra verileri yeniden çekelim
                 await refreshData();
             } else {
                 console.error("API başarısız yanıt döndü:", response);

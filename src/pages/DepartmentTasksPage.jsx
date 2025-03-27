@@ -16,7 +16,7 @@ import { faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip as ChartTooltip, Cell } from 'recharts';
 
 function DepartmentTasksPage() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [departmentTasks, setDepartmentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
