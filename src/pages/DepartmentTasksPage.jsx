@@ -64,9 +64,9 @@ function DepartmentTasksPage() {
   };
 
   return (
-    <div className="department-tasks-page">
-    
-      <div className={`department-tasks-container ${isOpen ? 'menu-open' : ''}`}>  <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
+    <div>
+    <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
+      <div className={`department-tasks-container ${isOpen ? 'menu-open' : ''}`}>  
         <Box sx={{ width: '96%', maxWidth: '1400px', margin: '0 auto', mb: 3 }}>
           <Paper 
             elevation={0} 

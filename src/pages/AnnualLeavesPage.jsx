@@ -15,11 +15,9 @@ function AnnualLeavesPage() {
     }, []);
 
     useEffect(() => {
-        console.log("AnnualLeavesPage - URL parametresi id:", id);
         if (id) {
             AnnualLeavesService.getAnnualLeaves(id)
                 .then(data => {
-                    console.log("API'den gelen izin verileri:", data);
                     setApiResponse(data);
                 })
                 .catch(error => {

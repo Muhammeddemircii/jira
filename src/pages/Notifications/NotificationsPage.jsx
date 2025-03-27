@@ -7,7 +7,6 @@ import { faBell, faCircle } from '@fortawesome/free-solid-svg-icons';
 
 function NotificationsPage() {
   const [isOpen, setIsOpen] = useState(false);
-  // Sample notifications - these would typically come from an API
   const [notifications, setNotifications] = useState([
     { id: 1, message: "Yıllık izin talebiniz onaylandı.", read: false, date: "21/04/2023" },
     { id: 2, message: "Yeni bir görev atandı: Rapor hazırlama.", read: true, date: "20/04/2023" },

@@ -17,8 +17,8 @@ import NotificationsPage from './pages/Notifications/NotificationsPage';
 import NotificationsSettingsPage from './pages/Notifications/NotificationsSettingsPage';
 import CompaniesPage from './pages/CompaniesPage';
 import DepartmentTasksPage from './pages/DepartmentTasksPage';
-import PersonnelTasksPage from './pages/PersonnelTasksPage';
-
+import PersonelTasksPage from './pages/PersonelTasksPage';
+import OvertimePage from './pages/OvertimePage';
 function AppContent() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -55,7 +55,8 @@ function AppContent() {
         <Route path="/NotificationsSettingsPage" element={<NotificationsSettingsPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
         <Route path="/DepartmentTasksPage" element={<DepartmentTasksPage />} />
-        <Route path="/PersonnelTasksPage" element={<PersonnelTasksPage />} />
+        <Route path="/PersonelTasksPage" element={<PersonelTasksPage />} />
+        <Route path="/OvertimePage/:id" element={<OvertimePage />} />
       </Routes>
     </BrowserRouter>
   );

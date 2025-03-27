@@ -77,7 +77,7 @@ function Navbar({ setIsOpen, isOpen }) {
         }
     }, [location]);
 
-    // Redirect if personnel tries to access unauthorized pages
+
     useEffect(() => {
         if (isPersonnel) {
             const path = location.pathname;
@@ -90,7 +90,7 @@ function Navbar({ setIsOpen, isOpen }) {
                 "/AnnualLeavesPage"
             ];
             
-            // Check if current path is not authorized
+
             const isAuthorized = authorizedPaths.some(authorizedPath => path.includes(authorizedPath));
             
             if (!isAuthorized && path !== "/") {
@@ -152,7 +152,7 @@ function Navbar({ setIsOpen, isOpen }) {
     }
 
     const handleAnnualLeave = () => {
-        const id = localStorage.getItem("user-id"); // Kullanıcı ID'sini localStorage'dan al
+        const id = localStorage.getItem("user-id");
         if (!id) {
             console.error("Hata: Kullanıcı ID bulunamadı!");
             return;
@@ -163,7 +163,16 @@ function Navbar({ setIsOpen, isOpen }) {
 
         if (window.innerWidth < 768) setIsOpen(false);
     };
-
+    const handleOvertime = () => {
+        const id = localStorage.getItem("user-id");
+        if (!id) {
+            console.error("Hata: Kullanıcı ID bulunamadı!");
+            return;
+        }     
+        navigate(`/OvertimePage/${id}`);
+        setActivePage("overtime");
+        if (window.innerWidth < 768) setIsOpen(false);
+    }
     const toggleTasksDropdown = () => setTasksDropdownOpen(!tasksDropdownOpen);
     const toggleTaskSettingsDropdown = () => setTaskSettingsDropdownOpen(!taskSettingsDropdownOpen);
     const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
@@ -205,11 +214,10 @@ function Navbar({ setIsOpen, isOpen }) {
         }
     };
 
-    // Function to handle save
     const handleSave = () => {
-        // Save changes logic here
+
         setHasUnsavedChanges(false);
-        // You would typically call your API or dispatch an action here
+  
         alert("Changes saved successfully!");
     };
 
@@ -246,12 +254,10 @@ function Navbar({ setIsOpen, isOpen }) {
     };
 
     const handlePersonnelTasks = () => {
-        navigate("/PersonnelTasksPage");
+        navigate("/PersonelTasksPage");
         setActivePage("personnelTasks");
         if (window.innerWidth < 768) setIsOpen(false);
     };
-
-    // Görevler dropdown'ı içindeki içerik
     const tasksDropdownContent = (
         <AnimatePresence>
             {tasksDropdownOpen && (
@@ -494,7 +500,7 @@ function Navbar({ setIsOpen, isOpen }) {
                                 Yıllık İzinler
                             </motion.div>
                             {!isPersonnel && (
-                                <motion.div variants={dropdownItemVariants} className="dropdown-item">
+                                <motion.div variants={dropdownItemVariants} className={`dropdown-item ${activePage === "overtime" ? "active" : ""}`} onClick={handleOvertime}>
                                     Mesailer
                                 </motion.div>
                             )}

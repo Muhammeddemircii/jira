@@ -1,0 +1,243 @@
+/* Overtime Page Styles */
+.overtime-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.overtime-header {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.overtime-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.overtime-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.overtime-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.overtime-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.overtime-date {
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+.overtime-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.overtime-time-item {
+  text-align: center;
+  flex: 1;
+}
+
+.overtime-time-label {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.overtime-entry-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #20b494;
+}
+
+.overtime-exit-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.overtime-duration {
+  text-align: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #e1e1e1;
+}
+
+.overtime-duration-label {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.overtime-duration-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.overtime-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.overtime-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.overtime-button.add {
+  background-color: #20b494;
+  color: white;
+  margin-right: 10px;
+}
+
+.overtime-button.add:hover {
+  background-color: #1a9279;
+}
+
+.overtime-form {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.overtime-form-title {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.overtime-form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.overtime-form-group {
+  flex: 1;
+}
+
+.overtime-form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.overtime-form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.overtime-form-input:focus {
+  border-color: #20b494;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(32, 180, 148, 0.2);
+}
+
+.overtime-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.overtime-submit-button {
+  background-color: #20b494;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.overtime-submit-button:hover {
+  background-color: #1a9279;
+}
+
+.overtime-cancel-button {
+  background-color: #95a5a6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.overtime-cancel-button:hover {
+  background-color: #7f8c8d;
+}
+
+.no-overtime-message {
+  text-align: center;
+  padding: 40px 0;
+  color: #7f8c8d;
+  font-size: 18px;
+}
+
+.no-overtime-message i {
+  display: block;
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #95a5a6;
+}
+
+@media (max-width: 768px) {
+  .overtime-cards-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .overtime-form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .overtime-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .overtime-button,
+  .overtime-submit-button,
+  .overtime-cancel-button {
+    width: 100%;
+    margin: 5px 0;
+  }
+} 

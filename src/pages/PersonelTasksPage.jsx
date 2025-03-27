@@ -6,11 +6,10 @@ import '../styles/Departments/DepartmentTasks.css';
 import Navbar from '../components/Navbar';
 
 function PersonnelTasksPage() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
-    // Simulating loading state for now
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -19,8 +18,9 @@ function PersonnelTasksPage() {
   }, []);
 
   return (
-    <div className="department-tasks-page">
+    <div>
       <Navbar setIsOpen={setIsOpen} isOpen={isOpen} />
+
       <div className={`department-tasks-container main-content ${isOpen ? 'menu-open' : ''}`}>
         <Typography variant="h4" component="h1" className="page-title">
           Personel Görevleri

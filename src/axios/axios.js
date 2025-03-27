@@ -647,16 +647,21 @@ export const AnnualLeavesService = {
 
 
 export const overTimeServices = {
-  getOverTimesServices: async () => {
+  getOverTimeServices: async () => {
     try{
-        const response = await api.get("")
+      const userId = localStorage.getItem('user-id');
+      if (!userId) {
+        throw new Error("Kullanıcı ID'si bulunamadı");
+      } 
+      const response = await api.get(`/api/v1/Overtime/GetByUserId?UserId=${userId}`);
+      console.log("Overtime verileri:", response.data);
+      return response.data;
     } catch(error){
       console.log(error)
     }
   }
 }
 
-// ... existing code ...
 
 export const companyService = {
   getCompanies: async () => {
