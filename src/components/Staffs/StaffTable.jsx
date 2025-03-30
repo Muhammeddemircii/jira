@@ -173,8 +173,9 @@ function StaffTable({ refreshTrigger = 0 }) {
             }
           } else {
             console.error("URL'den alınan departman ID'si bulunamadı:", departmanParam);
-            // Departman bulunamadı, tüm veriyi getir
+            // Departman bulunamadı durumunda yükleniyor göstergesi ile tüm verileri getir
             if (isComponentMountedRef.current) {
+              dispatch(setLoading(true)); // Yükleniyor göstergesini aktif et
               fetchStaff(1, '', false);
             }
           }
