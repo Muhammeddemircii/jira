@@ -43,8 +43,6 @@ function ProfilePage() {
 
         getProfiles();
     }, []);
-
-    // Determine margin based on screen size and sidebar state
     const getMarginLeft = () => {
         if (windowWidth <= 768) {
             return "0px";
