@@ -168,7 +168,6 @@ function Companies() {
     return (
       <Box className="companies-loading-container">
         <CircularProgress className="companies-loading-spinner" />
-        <Typography>Yükleniyor...</Typography>
       </Box>
     );
   }
