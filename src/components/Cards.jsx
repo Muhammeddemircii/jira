@@ -99,13 +99,50 @@ function Cards({isOpen, setOpenDetails, tasks, setSelectedTask}) {
     
     const handleTaskUpdated = async () => {
         try {
-            // Görevleri yeniden yükle
-            const tasksResponse = await tasksServices.getTasks();
-            if (Array.isArray(tasksResponse) && tasksResponse.length > 0) {
-                setTaskList(tasksResponse);
+            console.log("Görev güncellendi, veriler tamamen yenileniyor...");
+            
+            // Önce loading durumuna geç
+            setLoading(true);
+            
+            // Kategori verilerini taze bir şekilde yükle
+            const categoriesResponse = await tasksServices.getCategories();
+            if (categoriesResponse && Array.isArray(categoriesResponse)) {
+                setCategories(categoriesResponse);
+                console.log("Kategoriler yenilendi:", categoriesResponse.length);
+            } else if (categoriesResponse && categoriesResponse.data && Array.isArray(categoriesResponse.data)) {
+                setCategories(categoriesResponse.data);
+                console.log("Kategoriler yenilendi (data içinden):", categoriesResponse.data.length);
+            }
+            
+            // Ardından görevleri taze şekilde yükle (API'den direk çek, props'a bakma)
+            const tasksData = await tasksServices.getTasks();
+            console.log("Yenilenen API görev verileri:", tasksData);
+            
+            if (tasksData && Array.isArray(tasksData)) {
+                // Yeni bir dizi oluşturarak referansı değiştirip render'ı zorla
+                setTaskList([...tasksData]);
+                console.log("Görev listesi sıfırdan yenilendi:", tasksData.length);
+            } else if (tasksData && tasksData.data && Array.isArray(tasksData.data)) {
+                setTaskList([...tasksData.data]);
+                console.log("Görev listesi sıfırdan yenilendi (data içinden):", tasksData.data.length);
+            } else {
+                console.warn("Güncellenmiş görev listesi alınamadı");
+            }
+            
+            // Yeniden render için küçük bir gecikme ekle
+            setTimeout(() => {
+                setLoading(false);
+                // Sayfadaki tüm veriler yenilendi
+                console.log("Veri yenileme tamamlandı");
+            }, 300);
+            
+            // Üst bileşene de bildir
+            if (typeof setSelectedTask === 'function') {
+                setSelectedTask(null); // Seçimi sıfırla
             }
         } catch (error) {
             console.error("Görevler yeniden yüklenirken hata:", error);
+            setLoading(false);
         }
     };
     

@@ -26,6 +26,7 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     note: '',
     departmentId: '',
     durationId: '',
+    status: '',
     responsibleUsersId: [],
     files: [],
     priority: 3,
@@ -35,39 +36,90 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
   const [loading, setLoading] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [statusMap, setStatusMap] = useState({});
   const [errors, setErrors] = useState({});
+  
+  const statusOptions = [
+    { value: 'Beklemede', durationId: '19841b9d-e98a-474e-6eae-08dd72b2e88e' },
+    { value: 'Yapımda', durationId: '0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e' },
+    { value: 'Tamamlandı', durationId: '9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e' },
+    { value: 'Reddedildi', durationId: 'ba861628-2b0d-48cd-6eb0-08dd72b2e88e' }
+  ];
 
-  // Form verilerini başlatma
   useEffect(() => {
     if (task) {
-      setFormData({
+      console.log("---------------------------------------");
+      console.log("TASK DÜZENLEME FORMU DEBUG BAŞLANGIÇ");
+      console.log("---------------------------------------");
+      console.log("Düzenlenecek ham görev verisi:", task);
+      
+      let priorityValue = 3;
+      
+      if (task.priority !== undefined && task.priority !== null) {
+        if (typeof task.priority === 'string') {
+          priorityValue = parseInt(task.priority, 10) || 3;
+        } else if (typeof task.priority === 'number') {
+          priorityValue = task.priority;
+        }
+      }
+      
+      console.log("Öncelik değeri dönüşümü:", {
+        raw: task.priority,
+        rawType: typeof task.priority,
+        converted: priorityValue,
+        convertedType: typeof priorityValue
+      });
+      
+      const currentDurationId = task.durationId || '';
+      const currentStatus = statusOptions.find(s => s.durationId === currentDurationId)?.value || 'Beklemede';
+      
+      console.log("Mevcut DurationId:", currentDurationId);
+      console.log("Belirlenen durum:", currentStatus);
+      
+      const newFormData = {
         taskId: task.id || '',
         name: task.name || '',
         description: task.description || '',
         note: task.note || '',
         departmentId: task.departmentId || '',
-        durationId: task.durationId || '',
+        durationId: currentDurationId,
+        status: currentStatus,
         responsibleUsersId: task.responsibleUserIds || [],
         files: [],
-        priority: task.priority || 3,
+        priority: priorityValue,
         tenantId: task.tenantId || 'c35a6a8e-204b-4791-ba3b-08dd2c05ebe3'
-      });
+      };
+      
+      console.log("Form verileri hazırlandı:", newFormData);
+      console.log("---------------------------------------");
+      
+      setFormData(newFormData);
     }
   }, [task]);
 
-  // Departman ve kategori verilerini yükleme
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        // Departman verilerini getir
         const departmentsData = await departmentService.getDepartments();
         setDepartments(departmentsData);
         
-        // Kategori (durum) verilerini getir
         const categoriesData = await tasksServices.getCategories();
         setCategories(categoriesData);
+        
+        const durationToStatus = {};
+        categoriesData.forEach(category => {
+          let status = 'Beklemede';
+          if (category.name.includes('Tamamla')) status = 'Tamamlandı';
+          else if (category.name.includes('Yapım')) status = 'Yapımda';
+          else if (category.name.includes('Redde')) status = 'Reddedildi';
+          
+          durationToStatus[category.id] = status;
+        });
+        setStatusMap(durationToStatus);
+        
+        console.log("DurationId-Status eşleşmesi:", durationToStatus);
       } catch (error) {
         console.error('Veri yüklenirken hata oluştu:', error);
         toast.error('Veriler yüklenirken bir hata oluştu');
@@ -79,15 +131,50 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     fetchData();
   }, []);
 
-  // Form girdisi değişimini işleme
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
     
-    // Hata temizleme
+    if (name === 'status') {
+      console.log("Durum değişti:", value);
+      
+      const durationId = statusOptions.find(option => option.value === value)?.durationId || '';
+      console.log("Duruma göre yeni DurationId:", durationId);
+      
+      setFormData(prev => ({
+        ...prev,
+        status: value,
+        durationId: durationId
+      }));
+      
+      if (errors.durationId) {
+        setErrors(prev => ({ ...prev, durationId: '' }));
+      }
+    } else if (name === 'durationId') {
+      console.log("DurationId değişti:", value);
+      
+      const matchingOption = statusOptions.find(option => option.durationId === value);
+      const status = matchingOption?.value || formData.status;
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        status: status
+      }));
+    } else {
+      if (name === 'priority') {
+        const numValue = Number(value);
+        setFormData(prev => ({
+          ...prev,
+          [name]: numValue
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    }
+    
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -96,7 +183,6 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     }
   };
 
-  // Form doğrulama
   const validateForm = () => {
     const newErrors = {};
     
@@ -116,7 +202,6 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Formu gönderme
   const handleSubmit = async () => {
     if (!validateForm()) {
       return;
@@ -125,7 +210,22 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     try {
       setLoading(true);
       
-      const response = await tasksServices.updateTask(formData);
+      console.log("---------------------------------------");
+      console.log("FORM GÖNDERİMİ DEBUG");
+      console.log("---------------------------------------");
+      console.log("Gönderilecek tüm form verisi:", formData);
+      console.log("Öncelik değeri:", formData.priority, "tipi:", typeof formData.priority);
+      
+      const dataToSend = { ...formData };
+      
+      if (typeof dataToSend.priority !== 'number') {
+        dataToSend.priority = parseInt(dataToSend.priority, 10) || 3;
+      }
+      
+      console.log("API'ye gönderilecek düzenlenmiş veri:", dataToSend);
+      
+      const response = await tasksServices.updateTask(dataToSend);
+      console.log("API yanıtı:", response);
       
       if (response && response.isSuccess) {
         toast.success('Görev başarıyla güncellendi');
@@ -225,14 +325,31 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
               {errors.departmentId && <FormHelperText>{errors.departmentId}</FormHelperText>}
             </FormControl>
             
-            <FormControl fullWidth margin="normal" error={!!errors.durationId} required>
-              <InputLabel id="duration-label">Durum</InputLabel>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="status-label">Durum</InputLabel>
+              <Select
+                labelId="status-label"
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                label="Durum"
+              >
+                {statusOptions.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            
+            <FormControl fullWidth margin="normal" error={!!errors.durationId} required sx={{ display: 'none' }}>
+              <InputLabel id="duration-label">Durum (DurationId)</InputLabel>
               <Select
                 labelId="duration-label"
                 name="durationId"
                 value={formData.durationId}
                 onChange={handleInputChange}
-                label="Durum"
+                label="Durum (DurationId)"
               >
                 {categories.map(category => (
                   <MenuItem key={category.id} value={category.id}>

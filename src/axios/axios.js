@@ -187,49 +187,37 @@ export const tasksServices = {
 
   updateTask: async (taskData) => {
     try {
-      console.log("Görev güncelleme için API isteği gönderiliyor...");
-      console.log("Gönderilen veri:", JSON.stringify(taskData, null, 2));
+      console.log("Görev güncelleme başlatılıyor...");
+      console.log("Gelen veriler:", JSON.stringify(taskData, null, 2));
       
-      // Kullanıcı ID'sini localStorage'dan al
-      const currentUserId = localStorage.getItem('user-id');
-      console.log("Mevcut kullanıcı ID:", currentUserId);
+      // API, JSON bekliyor gibi görünüyor (createTask'ta olduğu gibi)
+      // Alan isimlerinin büyük harfle başlaması gerekiyor
       
-      // responsibleUsersId dizisi boşsa veya tanımlı değilse, mevcut kullanıcıyı ekle
-      let responsibleUsers = taskData.responsibleUsersId || [];
-      if (responsibleUsers.length === 0 && currentUserId) {
-        responsibleUsers = [currentUserId];
-        console.log("Sorumlu kullanıcı atanmamış, mevcut kullanıcı eklendi:", currentUserId);
-      }
+      // Öncelik değerini hazırla
+      const priority = taskData.priority !== undefined && taskData.priority !== null 
+        ? String(taskData.priority) 
+        : "3";
       
-      // Boş string içeren files dizisini temizle
-      const files = Array.isArray(taskData.files) 
-        ? taskData.files.filter(file => file && file !== "")
-        : [];
-      
-      // Priority'yi string olarak gönder (API belki string bekliyor)
-      const priority = taskData.priority?.toString() || "3";
-      
-      // JSON formatında gönder, FormData kullanma
+      // JSON verisi hazırla - createTask'a benzer şekilde
       const jsonData = {
-        taskId: taskData.taskId,
-        name: taskData.name,
-        description: taskData.description || "",
-        note: taskData.note || "",
-        departmentId: taskData.departmentId,
-        durationId: taskData.durationId,
-        priority: priority,
-        tenantId: taskData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3",
-        responsibleUsersId: responsibleUsers,
-        // Boş dizi yerine null veya undefined gönder
-        files: files.length > 0 ? files : null
+        TaskId: taskData.taskId,  // Büyük harfle başlayan alan adı
+        Name: taskData.name,      // Büyük harfle başlayan alan adı
+        Description: taskData.description || "",
+        Note: taskData.note || "",
+        DepartmentId: taskData.departmentId,
+        DurationId: taskData.durationId,
+        Priority: priority,
+        TenantId: taskData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3",
+        ResponsibleUsersId: taskData.responsibleUsersId || []
       };
       
       console.log("API'ye gönderilecek JSON verisi:", jsonData);
       
+      // JSON verisiyle istek gönder
       const response = await api.put("/api/v1/Task", jsonData, {
         headers: {
           "Content-Type": "application/json"
-        },
+        }
       });
       
       console.log("Görev güncelleme yanıtı:", response.data);
@@ -239,12 +227,6 @@ export const tasksServices = {
       if (error.response) {
         console.error("Hata detayları:", error.response.data);
         console.error("Hata durum kodu:", error.response.status);
-        console.error("Hata mesajı:", error.response.statusText);
-        
-        // Detaylı hata mesajını loglama
-        if (error.response.data && typeof error.response.data === 'object') {
-          console.error("API hata mesajı:", JSON.stringify(error.response.data, null, 2));
-        }
       }
       throw error;
     }
