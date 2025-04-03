@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import "../styles/Cards.css";
 import Loading from './Loading';
 import { tasksServices } from "../axios/axios";
+import EditTaskModal from './Tasks/EditTaskModal';
 
 function Cards({isOpen, setOpenDetails, tasks, setSelectedTask}) {
     const [taskList, setTaskList] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [currentTask, setCurrentTask] = useState(null);
 
     // Sayfa yüklendiğinde ve tasks prop'u değiştiğinde çalışacak effect
     useEffect(() => {
@@ -90,8 +93,20 @@ function Cards({isOpen, setOpenDetails, tasks, setSelectedTask}) {
     
     const handleCardClick = (task) => {
         console.log("Seçilen görev:", task);
-        setSelectedTask(task);
-        setOpenDetails(true);
+        setCurrentTask(task);
+        setEditModalOpen(true);
+    };
+    
+    const handleTaskUpdated = async () => {
+        try {
+            // Görevleri yeniden yükle
+            const tasksResponse = await tasksServices.getTasks();
+            if (Array.isArray(tasksResponse) && tasksResponse.length > 0) {
+                setTaskList(tasksResponse);
+            }
+        } catch (error) {
+            console.error("Görevler yeniden yüklenirken hata:", error);
+        }
     };
     
     return (
@@ -123,6 +138,15 @@ function Cards({isOpen, setOpenDetails, tasks, setSelectedTask}) {
                         ))
                     )}
                 </div>
+            )}
+            
+            {editModalOpen && currentTask && (
+                <EditTaskModal
+                    open={editModalOpen}
+                    handleClose={() => setEditModalOpen(false)}
+                    task={currentTask}
+                    onTaskUpdated={handleTaskUpdated}
+                />
             )}
         </div>
     );
