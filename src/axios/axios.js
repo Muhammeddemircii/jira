@@ -174,6 +174,24 @@ export const tasksServices = {
     }
   },
 
+  getTaskById: async (taskId) => {
+    try {
+      console.log(`Görev ID ile getiriliyor: ${taskId}`);
+      const response = await api.get(`/api/v1/Task/GetById?TaskId=${taskId}`);
+      console.log("Tek görev API yanıtı:", response.data);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Görev detay API yanıtı geçersiz format:", response.data);
+        throw new Error("Görev detayları alınamadı");
+      }
+    } catch (error) {
+      console.error(`${taskId} ID'li görev alınırken hata oluştu:`, error);
+      throw error;
+    }
+  },
+
   getCategories: async () => {
     try {
       const response = await api.get("/api/v1/Duration/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");

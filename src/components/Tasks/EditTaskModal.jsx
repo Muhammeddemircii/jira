@@ -210,14 +210,13 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
     try {
       setLoading(true);
       
-      console.log("---------------------------------------");
-      console.log("FORM GÖNDERİMİ DEBUG");
-      console.log("---------------------------------------");
       console.log("Gönderilecek tüm form verisi:", formData);
-      console.log("Öncelik değeri:", formData.priority, "tipi:", typeof formData.priority);
+      console.log("Özellikle durum değeri:", formData.status, "ve durationId:", formData.durationId);
       
+      // API'ye göndermeden önce bir kopya oluştur
       const dataToSend = { ...formData };
       
+      // Sayı tipinde olduğundan emin ol
       if (typeof dataToSend.priority !== 'number') {
         dataToSend.priority = parseInt(dataToSend.priority, 10) || 3;
       }
@@ -229,10 +228,20 @@ const EditTaskModal = ({ open, handleClose, task, onTaskUpdated }) => {
       
       if (response && response.isSuccess) {
         toast.success('Görev başarıyla güncellendi');
+        
+        // Önce callback'i çağır (opsiyonel)
         if (onTaskUpdated) {
           onTaskUpdated();
         }
+        
+        // Modal'ı kapat
         handleClose();
+        
+        // Sayfayı tamamen yenilemek için - tam bir yenileme yaparak görevlerin yerlerinin güncellenmesini sağla
+        console.log("Sayfa yenileniyor...");
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       } else {
         toast.error(response?.message || 'Görev güncellenirken bir hata oluştu');
       }

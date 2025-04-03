@@ -164,7 +164,15 @@ function Cards({isOpen, setOpenDetails, tasks, setSelectedTask}) {
                                 
                                 <div className="pending-cards">
                                     {taskList.filter(task => {
-                                        return task.durationId === category.id;
+                                        // Doğru eşleşme için durationId'leri string'e çevir ve karşılaştır
+                                        const taskDurationId = String(task.durationId || '');
+                                        const categoryId = String(category.id || '');
+                                        
+                                        // Debug için detaylı log 
+                                        console.log(`Karşılaştırma: Task (${task.name}) DurationId: ${taskDurationId}, Category ID: ${categoryId}, Eşleşme: ${taskDurationId === categoryId}`);
+                                        
+                                        // API'den gelen kategori ID'lerini eşleştir
+                                        return taskDurationId === categoryId;
                                     }).map(task => (
                                         <div key={task.id} onClick={() => handleCardClick(task)} className="task-card">
                                             <h3>{task.name}</h3>
