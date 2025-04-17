@@ -163,13 +163,126 @@ export const departmentService = {
 
 
 export const tasksServices = {
-  getTasks: async () => {
+  getTasks: async (parameters = {}) => {
     try {
-      const response = await api.get("/api/v1/Task/GetByTenantId?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      console.log(response.data.data);
+      const url = '/api/v1/Task';
+      console.log(`API çağrısı yapılıyor: ${url}`);
+      
+      const response = await api.get(url, { params: parameters });
+      
+      console.log("API yanıtı:", response);
+      
+      return response.data.data || [];
+    } catch (error) {
+      console.error("Görevler alınırken hata:", error);
+      throw error;
+    }
+  },
+
+  getTasksPaged: async (parameters = {}) => {
+    try {
+      const defaultParams = {
+        PageNumber: 1,
+        PageSize: 5,
+        TenantId: 'c35a6a8e-204b-4791-ba3b-08dd2c05ebe3' 
+      };
+      
+      const params = { ...defaultParams, ...parameters };
+      
+      const url = '/api/v1/Task/GetPaged';
+      
+      console.log(`API çağrısı yapılıyor: ${url}`, params);
+      
+      const token = localStorage.getItem("user-token");
+      console.log("Token durumu:", token ? "Token var" : "Token yok");
+      
+      const response = await api.get(url, { params });
+      
+      console.log("API yanıtı:", response);
+      
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        console.log("API'den gelen görevler:", response.data.data.length);
+        
+        // Get department information for each task if not already included
+        let tasks = response.data.data;
+        if (tasks[0] && !tasks[0].department && !tasks[0].departmentName) {
+          try {
+            const departments = await departmentService.getDepartments();
+            console.log("Departman bilgileri API yanıtı:", departments);
+            
+            // Map department IDs to department names
+            const departmentMap = {};
+            if (Array.isArray(departments)) {
+              departments.forEach(dept => {
+                departmentMap[dept.id] = dept.name;
+              });
+            }
+            
+            // Add department name to each task
+            tasks = tasks.map(task => {
+              if (task.departmentId && departmentMap[task.departmentId]) {
+                return { 
+                  ...task, 
+                  department: departmentMap[task.departmentId],
+                  departmentName: departmentMap[task.departmentId] 
+                };
+              }
+              return task;
+            });
+          } catch (deptError) {
+            console.error("Departman bilgileri alınırken hata oluştu:", deptError);
+          }
+        }
+        
+        return {
+          tasks: tasks,
+          totalCount: response.data.totalCount || 0,
+          totalPages: response.data.totalPages || 0,
+          currentPage: params.PageNumber
+        };
+      } else {
+        console.warn("API yanıtında task verisi bulunamadı, varsayılan görevler döndürülüyor");
+        
+        const dummyTasks = [
+          { id: "1", name: "Örnek Görev 1", description: "Bu bir örnek görevdir", durationId: params.DurationId, department: "Yazılım", departmentName: "Yazılım" },
+          { id: "2", name: "Örnek Görev 2", description: "Bu bir örnek görevdir", durationId: params.DurationId, department: "Pazarlama", departmentName: "Pazarlama" },
+          { id: "3", name: "Örnek Görev 3", description: "Bu bir örnek görevdir", durationId: params.DurationId, department: "İnsan Kaynakları", departmentName: "İnsan Kaynakları" }
+        ];
+        
+        return {
+          tasks: dummyTasks,
+          totalCount: dummyTasks.length,
+          totalPages: 1,
+          currentPage: 1
+        };
+      }
+    } catch (error) {
+      console.error("Sayfalı görevler alınırken hata:", error);
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      
+      // Hata durumunda varsayılan veriler
+      const dummyTasks = [
+        { id: "1", name: "Hata Durumu - Örnek Görev 1", description: "API hatası nedeniyle örnek görev", durationId: parameters.DurationId || "unknown", department: "Yazılım", departmentName: "Yazılım" },
+        { id: "2", name: "Hata Durumu - Örnek Görev 2", description: "API hatası nedeniyle örnek görev", durationId: parameters.DurationId || "unknown", department: "Pazarlama", departmentName: "Pazarlama" }
+      ];
+      
+      return {
+        tasks: dummyTasks,
+        totalCount: dummyTasks.length,
+        totalPages: 1,
+        currentPage: 1
+      };
+    }
+  },
+
+  getGroupTasksByUser: async (tenantId) => {
+    try {
+      const response = await api.get(`/api/v1/User/GroupTasksByUser?TenantId=${tenantId}`);
+      console.log("User group tasks response:", response.data);
       return response.data.data;
     } catch (error) {
-      console.error("Task verileri alınırken hata oluştu:", error);
+      console.error("User group tasks alınırken hata oluştu:", error);
       throw error;
     }
   },
@@ -194,12 +307,40 @@ export const tasksServices = {
 
   getCategories: async () => {
     try {
-      const response = await api.get("/api/v1/Duration/GetByTenant?TenantId=c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
-      console.log(response.data.data);
-      return response.data.data;
+      console.log("Kategori verileri alınıyor...");
+      const token = localStorage.getItem("user-token");
+      console.log("Token durumu:", token ? "Token var" : "Token yok");
+      
+      const tenantId = "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3";
+      console.log(`Kategoriler için API isteği: /api/v1/Duration/GetByTenant?TenantId=${tenantId}`);
+      
+      const response = await api.get(`/api/v1/Duration/GetByTenant?TenantId=${tenantId}`);
+      console.log("Kategori API yanıtı:", response);
+      
+      if (response.data && response.data.data) {
+        console.log("Kategori verileri başarıyla alındı, toplam:", response.data.data.length);
+        return response.data.data;
+      } else {
+        console.error("Kategori API yanıtı geçersiz format:", response.data);
+        
+        return [
+          { id: "9f0122da-a697-4aed-52af-08dd2c05ec2e", name: "Beklemede" },
+          { id: "577ba8ad-f6d8-430a-52b0-08dd2c05ec2e", name: "Yapımda" },
+          { id: "492d6a56-590c-47f1-52b1-08dd2c05ec2e", name: "Tamamlandı" },
+          { id: "2f985dfd-f22a-4294-52b2-08dd2c05ec2e", name: "Reddedildi" }
+        ];
+      }
     } catch (error) {
       console.error("Kategori çekerken hata oluştu:", error);
-      throw error;
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+
+      return [
+        { id: "9f0122da-a697-4aed-52af-08dd2c05ec2e", name: "Beklemede" },
+        { id: "577ba8ad-f6d8-430a-52b0-08dd2c05ec2e", name: "Yapımda" },
+        { id: "492d6a56-590c-47f1-52b1-08dd2c05ec2e", name: "Tamamlandı" },
+        { id: "2f985dfd-f22a-4294-52b2-08dd2c05ec2e", name: "Reddedildi" }
+      ];
     }
   },
 
@@ -208,18 +349,12 @@ export const tasksServices = {
       console.log("Görev güncelleme başlatılıyor...");
       console.log("Gelen veriler:", JSON.stringify(taskData, null, 2));
       
-      // API, JSON bekliyor gibi görünüyor (createTask'ta olduğu gibi)
-      // Alan isimlerinin büyük harfle başlaması gerekiyor
-      
-      // Öncelik değerini hazırla
       const priority = taskData.priority !== undefined && taskData.priority !== null 
         ? String(taskData.priority) 
         : "3";
-      
-      // JSON verisi hazırla - createTask'a benzer şekilde
-      const jsonData = {
-        TaskId: taskData.taskId,  // Büyük harfle başlayan alan adı
-        Name: taskData.name,      // Büyük harfle başlayan alan adı
+        const jsonData = {
+        TaskId: taskData.taskId,
+        Name: taskData.name,
         Description: taskData.description || "",
         Note: taskData.note || "",
         DepartmentId: taskData.departmentId,
@@ -231,7 +366,6 @@ export const tasksServices = {
       
       console.log("API'ye gönderilecek JSON verisi:", jsonData);
       
-      // JSON verisiyle istek gönder
       const response = await api.put("/api/v1/Task", jsonData, {
         headers: {
           "Content-Type": "application/json"
@@ -250,25 +384,176 @@ export const tasksServices = {
     }
   },
 
+  updateTaskDuration: async (taskId, durationId) => {
+    try {
+      console.log("Görev durumu güncelleme başlatılıyor...");
+      console.log(`TaskId: ${taskId}, DurationId: ${durationId}`);
+      
+      const jsonData = {
+        TaskId: taskId,
+        DurationId: durationId,
+        TenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      };
+      
+      console.log("API'ye gönderilecek JSON verisi:", jsonData);
+      
+      const response = await api.put("/api/v1/Task/DurationUpdate", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      console.log("Görev durumu güncelleme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Görev durumu güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+
+  taskRejected: async (taskId, rejectedReason) => {
+    try {
+      console.log("Görev reddetme işlemi başlatılıyor...");
+      console.log(`TaskId: ${taskId}, ReddetmeNedeni: ${rejectedReason}`);
+      
+      const jsonData = {
+        TaskId: taskId,
+        RejectedReason: rejectedReason,
+        TenantId: "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      };
+      
+      console.log("API'ye gönderilecek JSON verisi:", jsonData);
+      
+      const response = await api.put("/api/v1/Task/TaskRejected", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      console.log("Görev reddetme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Görev reddedilirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+
+  updateTaskDepartment: async (departmentData) => {
+    try {
+      console.log("Görev departman güncelleme başlatılıyor...");
+      console.log("Gelen departman verileri:", JSON.stringify(departmentData, null, 2));
+      
+      const jsonData = {
+        TaskId: departmentData.taskId,
+        DepartmentId: departmentData.departmentId,
+        TenantId: departmentData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      };
+      
+      console.log("API'ye gönderilecek JSON verisi:", jsonData);
+      
+      const response = await api.put("/api/v1/Task/DepartmentUpdate", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      console.log("Görev departman güncelleme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Görev departman güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+
+  updateTaskType: async (taskTypeData) => {
+    try {
+      console.log("Görev tipi güncelleme başlatılıyor...");
+      console.log("Gelen görev tipi verileri:", JSON.stringify(taskTypeData, null, 2));
+      
+      const jsonData = {
+        TaskId: taskTypeData.taskId,
+        TaskTypeId: taskTypeData.taskTypeId,
+        TenantId: taskTypeData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      };
+      
+      console.log("API'ye gönderilecek JSON verisi:", jsonData);
+      
+      const response = await api.put("/api/v1/Task/TaskTypeUpdateUpdate", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      console.log("Görev tipi güncelleme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Görev tipi güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+
+  updateTaskPriority: async (priorityData) => {
+    try {
+      console.log("Görev önceliği güncelleme başlatılıyor...");
+      console.log("Gelen öncelik verileri:", JSON.stringify(priorityData, null, 2));
+      
+      const jsonData = {
+        TaskId: priorityData.taskId,
+        Priority: String(priorityData.priority),
+        TenantId: priorityData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"
+      };
+      
+      console.log("API'ye gönderilecek JSON verisi:", jsonData);
+      
+      const response = await api.put("/api/v1/Task/TaskPriorityUpdate", jsonData, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      console.log("Görev önceliği güncelleme yanıtı:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Görev önceliği güncellenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+      }
+      throw error;
+    }
+  },
+
   createTask: async (taskData) => {
     try {
-      // İstek gönderilmeden önce verileri detaylı olarak logla
       console.log("Görev ekleme isteği gönderiliyor...");
 
-      // taskData'nın FormData olup olmadığını kontrol et
       let formData;
 
       if (taskData instanceof FormData) {
         console.log("taskData zaten FormData olarak gönderilmiş");
         formData = taskData;
 
-        // FormData içeriğini log etmek için
         console.log("Gelen FormData içeriği:");
         for (let pair of formData.entries()) {
           console.log(`${pair[0]}: ${pair[1]}`);
         }
 
-        // Name alanını özel olarak kontrol et
         let nameValue = formData.get('Name');
         if (!nameValue || nameValue.trim() === "") {
           console.error("Name alanı FormData içinde boş veya tanımsız!");
@@ -277,39 +562,33 @@ export const tasksServices = {
 
         console.log("Name alanı FormData içinde mevcut:", nameValue);
 
-        // DurationId'yi kontrol et ve logla
         const durationId = formData.get('DurationId');
         if (durationId) {
           console.log("DurationId FormData içinde mevcut:", durationId);
 
-          // DurationId'nin doğru formatta olduğundan emin olalım
           if (durationId.length < 5) {
             console.error("DurationId çok kısa, geçersiz olabilir:", durationId);
           } else {
             console.log("DurationId geçerli formatta görünüyor");
           }
 
-          // DurationId'nin zaten formData içinde olduğundan emin olalım
-          // Bu, DurationId'nin API'ye iletilmesini garantiler
           console.log("DurationId API'ye gönderilecek:", durationId);
         } else {
           console.warn("DurationId FormData içinde bulunamadı!");
 
-          // Status'a göre manuel DurationId ekleme
           const status = formData.get('Status');
           if (status) {
             console.log("Status değeri mevcut, ancak DurationId eksik. Status:", status);
 
-            // Manuel olarak status'a göre DurationId ekle
             let durationId = null;
             if (status === "Reddedildi") {
-              durationId = "ba861628-2b0d-48cd-6eb0-08dd72b2e88e"; // Reddedilenler
+              durationId = "ba861628-2b0d-48cd-6eb0-08dd72b2e88e";
             } else if (status === "Beklemede") {
-              durationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e"; // Beklemede
+              durationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e";
             } else if (status === "Atandı") {
-              durationId = "0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e"; // Yapımda
+              durationId = "0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e";
             } else if (status === "Tamamlandı") {
-              durationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e"; // Tamamlananlar
+              durationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e";
             }
 
             if (durationId) {
@@ -319,7 +598,6 @@ export const tasksServices = {
           }
         }
 
-        // Formdata içinde DurationId'nin son durumunu kontrol et
         const finalDurationId = formData.get('DurationId');
         if (finalDurationId) {
           console.log("API'ye gönderilecek DurationId:", finalDurationId);
@@ -327,24 +605,19 @@ export const tasksServices = {
           console.error("DurationId hala bulunamadı, bir kategori seçilememesi problemi olabilir!");
         }
       } else {
-        // JSON veri olarak geldi, FormData'ya çevir
         console.log("API'ye gönderilecek veriler:", JSON.stringify(taskData, null, 2));
 
-        // Name alanını büyük harfle kullanım için kontrol et
         if (taskData.Name === undefined && taskData.name !== undefined) {
           console.log("Name alanı küçük harfle gönderilmiş, büyük harfe dönüştürülüyor.");
           taskData.Name = taskData.name;
           delete taskData.name;
         }
 
-        // Name alanının değerini kontrol et ve düzelt
         if (taskData.Name) {
-          // Gereksiz boşlukları temizle ve tek bir boşluğa dönüştür
           taskData.Name = taskData.Name.trim().replace(/\s+/g, " ");
           console.log("Name alanı düzeltildi:", taskData.Name);
           console.log("Name uzunluğu:", taskData.Name.length);
 
-          // İsim boş ise hata fırlat
           if (taskData.Name === "") {
             console.error("Name alanı boş!");
             throw new Error("Görev adı boş olamaz");
@@ -354,23 +627,20 @@ export const tasksServices = {
           throw new Error("Görev adı tanımlanmamış");
         }
 
-        // Swagger'daki örneğe göre FormData kullan
         formData = new FormData();
         formData.append('TenantId', taskData.TenantId || taskData.tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
         formData.append('Name', taskData.Name);
         formData.append('Description', taskData.Description || taskData.description || "");
         formData.append('DepartmentId', taskData.DepartmentId || taskData.departmentId || "d1d4cae5-039d-415f-305e-08dd5ae73144");
-        formData.append('TaskTypeId', taskData.TaskTypeId || taskData.taskTypeId || ""); // Boş string olarak gönder
+        formData.append('TaskTypeId', taskData.TaskTypeId || taskData.taskTypeId || "");
         formData.append('CreateUserId', taskData.CreateUserId || taskData.createUserId || "b3f43f03-8784-430a-6ebb-08dd2c05ec10");
         formData.append('Priority', taskData.Priority || taskData.priority || "3");
 
-        // DurationId ekle
         if (taskData.DurationId || taskData.durationId) {
           formData.append('DurationId', taskData.DurationId || taskData.durationId);
           console.log('DurationId eklendi:', taskData.DurationId || taskData.durationId);
         }
 
-        // Dosya ve sorumlular için dizileri kontrol et
         if (taskData.ResponsibleUsersId && taskData.ResponsibleUsersId.length > 0) {
           taskData.ResponsibleUsersId.forEach(userId => {
             formData.append('ResponsibleUsersId', userId);
@@ -386,17 +656,12 @@ export const tasksServices = {
 
       console.log("FormData hazır, API'ye gönderiliyor");
 
-      // Son bir kez FormData içeriğini log et
       console.log("API'ye gönderilecek FormData içeriği:");
       for (let pair of formData.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
 
       const response = await api.post("/api/v1/Task", formData, {
-        headers: {
-          // Content-Type başlığını FormData ile kullanırken kaldır
-          // Tarayıcı bunu otomatik olarak doğru boundary ile ayarlayacak
-        },
       });
 
       console.log("API Yanıtı:", response.data);
@@ -414,11 +679,9 @@ export const tasksServices = {
       if (error.response) {
         console.error("Hata detayları:", error.response.data);
 
-        // Detaylı hata bilgilerini göster
         if (error.response.data && error.response.data.errors) {
           console.error("Validation hatası detayları:", JSON.stringify(error.response.data.errors, null, 2));
 
-          // Name field hatasını özel olarak kontrol et
           if (error.response.data.errors.Name || error.response.data.errors.name) {
             console.error("Name alanı ile ilgili hata var!");
             console.error("Gönderilen name değeri:", taskData.Name);
@@ -429,7 +692,6 @@ export const tasksServices = {
         console.error("Hata status:", error.response.status);
         console.error("Hata headers:", error.response.headers);
 
-        // 401 Unauthorized hatası için özel mesaj
         if (error.response.status === 401) {
           throw new Error("Yetkilendirme hatası: Oturum süresi dolmuş olabilir, lütfen tekrar giriş yapın.");
         }
@@ -439,6 +701,96 @@ export const tasksServices = {
         console.error("İstek oluşturulurken hata:", error.message);
       }
       throw error;
+    }
+  },
+
+  addTaskLog: async (taskLogData) => {
+    try {
+      console.log("Görev log ekleme başlatılıyor...");
+      console.log("Gelen veriler:", JSON.stringify(taskLogData, null, 2));
+      
+      // Format times properly if they exist
+      const startTime = taskLogData.startTime ? `${taskLogData.startTime}:00` : null;
+      const endTime = taskLogData.endTime ? `${taskLogData.endTime}:00` : null;
+      
+      // Two different request formats to try
+      const requestData = {
+        taskId: taskLogData.taskId,
+        userId: taskLogData.userId || localStorage.getItem("user-id"),
+        duration: parseInt(taskLogData.duration) || 0,
+        description: taskLogData.description || "",
+        date: taskLogData.date || new Date().toISOString().split('T')[0],
+        startTime: startTime,
+        endTime: endTime
+      };
+      
+      // First try with direct request format
+      console.log("API'ye gönderilecek JSON verisi (1. format):", requestData);
+      
+      try {
+        const response = await api.post("/api/v1/Task/AddTaskLog", requestData, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        
+        console.log("Görev log ekleme yanıtı:", response.data);
+        return response.data;
+      } catch (directRequestError) {
+        console.error("İlk request formatı başarısız oldu, alternatif formatı deniyorum");
+        console.error("Hata detayları:", directRequestError.response?.data);
+        
+        // If first format fails, try with wrapped "request" object
+        const wrappedRequest = {
+          request: requestData
+        };
+        
+        console.log("API'ye gönderilecek JSON verisi (2. format):", wrappedRequest);
+        
+        const response = await api.post("/api/v1/Task/AddTaskLog", wrappedRequest, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        
+        console.log("Görev log ekleme yanıtı:", response.data);
+        return response.data;
+      }
+    } catch (error) {
+      console.error("Görev log eklenirken hata oluştu:", error);
+      if (error.response) {
+        console.error("Hata detayları:", error.response.data);
+        console.error("Hata durum kodu:", error.response.status);
+        
+        // Log detailed validation errors if present
+        if (error.response.data && error.response.data.errors) {
+          console.error("Validation hataları:", JSON.stringify(error.response.data.errors, null, 2));
+          Object.keys(error.response.data.errors).forEach(key => {
+            console.error(`${key} alanı hatası:`, error.response.data.errors[key]);
+          });
+        }
+      }
+      throw error;
+    }
+  },
+
+  getUsersByTenantId: async (tenantId) => {
+    try {
+      console.log("Kiracıya bağlı kullanıcılar alınıyor...");
+      const response = await api.get(`/api/v1/User/GetByTenantId?TenantId=${tenantId || "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3"}`);
+      console.log("Kullanıcı listesi API yanıtı:", response.data);
+      
+      if (response.data && response.data.data) {
+        return response.data.data;
+      } else {
+        console.error("Kullanıcı listesi API yanıtı geçersiz format:", response.data);
+        return [];
+      }
+    } catch (error) {
+      console.error("Kullanıcı listesi alınırken hata oluştu:", error);
+      console.error("Hata detayları:", error.response?.data);
+      console.error("Hata durum kodu:", error.response?.status);
+      return [];
     }
   },
 };
@@ -632,7 +984,6 @@ export const taskTypeService = {
 
   createTaskType: async (taskTypeData) => {
     try {
-      // Send as JSON according to Swagger docs
       const jsonData = {
         name: taskTypeData.name,
         relatedDepartmentId: taskTypeData.relatedDepartmentId || "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -647,31 +998,6 @@ export const taskTypeService = {
       return response.data;
     } catch (error) {
       console.error("TaskType oluşturulurken hata oluştu:", error);
-      throw error;
-    }
-  },
-
-  updateTaskType: async (taskTypeData) => {
-    try {
-      // Convert to JSON payload format as per Swagger docs
-      const jsonData = {
-        taskTypeId: taskTypeData.id,
-        name: taskTypeData.name,
-        title: taskTypeData.name, // Using name as title if not provided
-        relatedDepartmentId: taskTypeData.relatedDepartmentId || ""
-      };
-
-      console.log("TaskType güncelleme verisi:", jsonData);
-
-      const response = await api.put(`/api/v1/TaskType`, jsonData, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      console.log("TaskType güncelleme yanıtı:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("TaskType güncellenirken hata oluştu:", error);
       throw error;
     }
   },

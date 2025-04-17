@@ -128,8 +128,8 @@
 
 .task-card {
     width: 100%;
-    min-height: 90px;
-    padding: 18px;
+    min-height: 130px;
+    padding: 20px;
     margin: 10px 0;
     background-color: white;
     border: none;
@@ -137,7 +137,7 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
-    align-items: center;
+    flex-direction: column;
     position: relative;
     overflow: hidden;
 }
@@ -180,25 +180,135 @@
 }
 
 .task-card > h3 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 500;
-    color: #444;
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
     line-height: 1.4;
     position: relative;
     z-index: 1;
     transition: all 0.3s ease;
+    padding-right: 50px; /* Badge için daha fazla alan */
 }
 
 .task-card:hover > h3 {
     color: #20b494;
     transform: translateX(3px);
 }
+
+.task-card-description {
+    font-size: 12px;
+    color: #666;
+    margin: 0 0 18px 0;
+    font-style: italic;
+    opacity: 0.8;
+    z-index: 1;
+    line-height: 1.4;
+}
+
+.task-card-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-top: auto;
+    z-index: 1;
+}
+
+.task-card-department {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c3e50;
+    background-color: rgba(32, 180, 148, 0.1);
+    border-radius: 12px;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+}
+
+.task-card-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11px;
+    color: #777;
+    margin-top: 5px;
+}
+
+.task-card-date {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.task-card-date-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 85px;
+}
+
+.task-badge {
+    position: absolute;
+    right: 40px;
+    top: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid #fff;
+}
+
+.task-badge-visible {
+    animation: pulse 2s infinite;
+}
+
+/* Öncelik değerlerine göre rozet renkleri */
+.task-badge-visible[data-priority="0"] {
+    background-color: #d32f2f; /* Çok Yüksek öncelik - Koyu Kırmızı */
+}
+
+.task-badge-visible[data-priority="1"] {
+    background-color: #f44336; /* Yüksek öncelik - Kırmızı */
+}
+
+.task-badge-visible[data-priority="2"] {
+    background-color: #ff9800; /* Orta öncelik - Turuncu */
+}
+
+.task-badge-visible[data-priority="3"] {
+    background-color: #4caf50; /* Düşük öncelik - Yeşil */
+}
+
+.task-badge-visible[data-priority="4"] {
+    background-color: #8bc34a; /* Çok Düşük öncelik - Açık Yeşil */
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(32, 180, 148, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+}
   
 @media screen and (max-width: 1400px) {
     .card-open, .card-close {
       grid-template-columns: repeat(3, 1fr);
       width: 98%;
+      gap: 16px;
     }
 }
   
@@ -206,6 +316,11 @@
     .card-open, .card-close {
       grid-template-columns: repeat(2, 1fr);
       width: 98%;
+      gap: 14px;
+    }
+    
+    .task-card {
+      min-height: 130px;
     }
 }
   
@@ -214,11 +329,152 @@
       grid-template-columns: 1fr;
       width: 100%;
       padding: 0 10px;
+      gap: 12px;
     }
     
     .pending {
       height: auto;
       min-height: 400px;
-      padding: 20px;
+      padding: 16px;
     }
+    
+    .task-card {
+      min-height: auto;
+      padding: 16px;
+    }
+    
+    .task-card-date-label {
+      min-width: 75px;
+    }
+}
+
+/* Daha Fazla Göster butonu stilleri */
+.load-more-button {
+  margin: 10px auto;
+  padding: 8px 15px;
+  background-color: #20b494;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: block;
+  width: calc(100% - 20px);
+}
+
+.load-more-button:hover {
+  background-color: #189c82;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.load-more-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Infinite Scroll için CSS */
+.infinite-scroll-loader {
+  height: 40px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.loader-dots {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 10px;
+}
+
+.loader-dots:after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: linear-gradient(90deg, #20b494, transparent);
+  border-radius: 10px;
+  position: absolute;
+  left: 0;
+  animation: loadingDots 1.2s infinite;
+}
+
+@keyframes loadingDots {
+  0% {
+    left: 0;
+    width: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 30px;
+    opacity: 0.5;
+  }
+  100% {
+    left: 100%;
+    width: 0;
+    opacity: 0;
+  }
+}
+
+/* Drag and Drop styles */
+.task-card.dragging {
+  opacity: 0.6;
+  transform: scale(0.95);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  cursor: grabbing;
+}
+
+.task-card {
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.pending.drag-over {
+  background-color: rgba(32, 180, 148, 0.1);
+  border: 2px dashed #20b494;
+  border-radius: 10px;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.pending.drag-over h3 {
+  color: #20b494;
+}
+
+.infinite-scroll-loader {
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.loader-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-dots::after {
+  content: "...";
+  font-size: 24px;
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: ".";
+  }
+  40% {
+    content: "..";
+  }
+  60%, 100% {
+    content: "...";
+  }
 }

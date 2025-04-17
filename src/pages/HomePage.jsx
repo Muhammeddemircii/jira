@@ -5,14 +5,11 @@ import { motion } from "framer-motion";
 import Cards from "../components/Cards";
 import { } from "../styles/Cards.css"
 import { departmentService } from "../axios/axios";
-import TaskDetails from "../components/Tasks/TaskDetails";
 
 const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [departmanListesi, setDepartmanListesi] = useState([]);
-  const [openDetails, setOpenDetails] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -61,21 +58,10 @@ const HomePage = () => {
           transition={{ type: "spring", stiffness: 100, damping: 20 }}
           className={`flex flex-col items-center main-content ${isOpen ? 'menu-open' : ''}`}
         >
-          {openDetails && (
-            <div className="task-details-overlay">
-              <TaskDetails
-                selectedTask={selectedTask}
-                setOpenDetails={setOpenDetails}
-              />
-            </div>
-          )}
-
           <Cards
             tasks={tasks}
             isOpen={isOpen}
             departmanListesi={departmanListesi}
-            setOpenDetails={setOpenDetails}
-            setSelectedTask={setSelectedTask}
             className={`${!isOpen ? "card-close" : "card-open"}`}
           />
         </motion.div>

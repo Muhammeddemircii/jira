@@ -89,32 +89,7 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
 
        let selectedDurationId = null;
       
-      // console.log("SEÇILEN STATÜ:", status);
       
-     
-      // if (status === "Reddedildi") {
-      
-      //   selectedDurationId = "ba861628-2b0d-48cd-6eb0-08dd72b2e88e";
-      //   console.log(`"Reddedildi" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
-      // } else if (status === "Beklemede") {
-       
-      //   selectedDurationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e";
-      //   console.log(`"Beklemede" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
-      // } else if (status === "Atandı") {
-      
-      //   selectedDurationId = "0fc8818d-27a3-4e8b-6eaf-08dd72b2e88e";
-      //   console.log(`"Atandı" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
-      // } else if (status === "Tamamlandı") {
-       
-      //   selectedDurationId = "9f3fd5a1-7f18-4e27-6eb1-08dd72b2e88e";
-      //   console.log(`"Tamamlandı" statüsü için sabit kategori ID kullanılıyor: ${selectedDurationId}`);
-      // } else {
-       
-      //   selectedDurationId = "19841b9d-e98a-474e-6eae-08dd72b2e88e"; 
-      //   console.warn(`Tanınmayan statü: ${status}, varsayılan "Beklemede" kategorisi kullanılıyor`);
-      // }
-      
-     
       const formData = new FormData();
       formData.append("TenantId", "c35a6a8e-204b-4791-ba3b-08dd2c05ebe3");
       
@@ -256,22 +231,6 @@ const AddTask = ({ setOpen, setLoading, handleSave, currentUserId, currentUserTe
             <MenuItem value="5">Çok Yüksek</MenuItem>
           </Select>
         </FormControl>
-{/* 
-        <FormControl>
-          <InputLabel id="status-label">Statü</InputLabel>
-          <Select
-            labelId="status-label"
-            id="status-select"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            label="Statü"
-          >
-            <MenuItem value="Beklemede">Beklemede</MenuItem>
-            <MenuItem value="Atandı">Atandı</MenuItem>
-            <MenuItem value="Tamamlandı">Tamamlandı</MenuItem>
-            <MenuItem value="Reddedildi">Reddedildi</MenuItem>
-          </Select>
-        </FormControl> */}
 
         <div className="task-buttons">
           <Button onClick={handleCloseAddTask}>Kapat</Button>

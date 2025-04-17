@@ -260,14 +260,13 @@ const AnnualLeaveTable = ({ apiData, isGroupView, onLeaveUpdated }) => {
             <th>Bitiş Tarihi</th>
             <th>İşe Başlama Tarihi</th>
             <th>İzin Gün Sayısı</th>
-            <th>Durum</th>
             {isGroupManager && <th>İşlemler</th>}
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={isGroupView ? (isGroupManager ? "8" : "7") : (isGroupManager ? "7" : "6")}>
+              <td colSpan={isGroupView ? (isGroupManager ? "7" : "6") : (isGroupManager ? "6" : "5")}>
                 <Loading />
               </td>
             </tr>
@@ -281,11 +280,6 @@ const AnnualLeaveTable = ({ apiData, isGroupView, onLeaveUpdated }) => {
                   <td>{formatDate(leave.endDate)}</td>
                   <td>{formatDate(leave.startWorkDate)}</td>
                   <td>{leave.leaveDays}</td>
-                  <td>
-                    <span className={getStatusBadgeClass(leave.status)}>
-                      {leave.status || 'Beklemede'}
-                    </span>
-                  </td>
                   {isGroupManager && (
                     <td>
                       {leave.status === 'Beklemede' && (
@@ -315,7 +309,7 @@ const AnnualLeaveTable = ({ apiData, isGroupView, onLeaveUpdated }) => {
               ))}
               {!loading && (!filteredLeaveData || filteredLeaveData.length === 0) && (
                 <tr>
-                  <td colSpan={isGroupView ? (isGroupManager ? "8" : "7") : (isGroupManager ? "7" : "6")} style={{ textAlign: 'center', padding: '20px' }}>
+                  <td colSpan={isGroupView ? (isGroupManager ? "7" : "6") : (isGroupManager ? "6" : "5")} style={{ textAlign: 'center', padding: '20px' }}>
                     Kayıt bulunamadı.
                   </td>
                 </tr>
@@ -331,7 +325,7 @@ const AnnualLeaveTable = ({ apiData, isGroupView, onLeaveUpdated }) => {
           onClick={() => setShowModal(true)}
           disabled={loading}
         >
-          Yeni İzin Talebi
+          İzin Al
         </button>
       </div>
 
