@@ -1,15 +1,13 @@
-
-
 .department-tasks-container {
   padding: 24px;
-  width: 100%;
+  width: calc(100% - 48px);
   transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
-  margin-left: 0;
+  margin: 0 auto;
 }
 
 .department-tasks-container.menu-open {
   margin-left: 260px;
-  width: calc(100% - 260px);
+  width: calc(100% - 260px - 48px);
 }
 
 .header-container {
@@ -235,9 +233,14 @@
 }
 
 @media (max-width: 768px) {
+  .department-tasks-container {
+    padding: 16px;
+    width: calc(100% - 32px);
+  }
+  
   .department-tasks-container.menu-open {
     margin-left: 0;
-    width: 100%;
+    width: calc(100% - 32px);
   }
   
   .header-container {

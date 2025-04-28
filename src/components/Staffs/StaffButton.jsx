@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
     Button, 
     Box, 
     Typography, 
-    Paper
+    Paper,
+    Fab
 } from '@mui/material';
 import AddStaff from "./AddStaff";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSpinner, faUsers } from '@fortawesome/free-solid-svg-icons';
+import AddIcon from '@mui/icons-material/Add';
 import StaffTable from './StaffTable';
 import '../../styles/Staffs/StaffButton.css';
 import '../../styles/Staffs/AddStaff.css';
@@ -16,6 +18,20 @@ function StaffButton() {
     const [loadingStaffButton, setLoadingStaffButton] = useState(false);
     const [openAddStaff, setOpenAddStaff] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkIfMobile();
+        window.addEventListener('resize', checkIfMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
 
     const handleAddStaff = () => {
         setLoadingStaffButton(true);
@@ -63,29 +79,51 @@ function StaffButton() {
                     </Typography>
                 </Box>
                 
-                <Button
-                    onClick={handleAddStaff}
-                    variant="contained"
-                    disabled={loadingStaffButton}
-                    startIcon={
-                        <FontAwesomeIcon
-                            icon={loadingStaffButton ? faSpinner : faPlus}
-                            spin={loadingStaffButton}
-                        />
-                    }
-                    sx={{ 
-                        bgcolor: "#20b494",
-                        '&:hover': {
-                            bgcolor: "#18a085"
-                        },
-                        px: 3
-                    }}
-                >
-                    {loadingStaffButton ? "Yükleniyor..." : "Personel Ekle"}
-                </Button>
+                {!isMobile && (
+                    <Button
+                        onClick={handleAddStaff}
+                        variant="contained"
+                        disabled={loadingStaffButton}
+                        startIcon={
+                            <FontAwesomeIcon
+                                icon={loadingStaffButton ? faSpinner : faPlus}
+                                spin={loadingStaffButton}
+                            />
+                        }
+                        sx={{ 
+                            bgcolor: "#20b494",
+                            '&:hover': {
+                                bgcolor: "#18a085"
+                            },
+                            px: 3
+                        }}
+                    >
+                        {loadingStaffButton ? "Yükleniyor..." : "Personel Ekle"}
+                    </Button>
+                )}
             </Paper>
             
             <StaffTable refreshTrigger={refreshTrigger} />
+
+            {/* Mobil Görünüm için + Butonu */}
+            {isMobile && (
+                <Fab 
+                    color="primary" 
+                    aria-label="add" 
+                    onClick={handleAddStaff}
+                    sx={{ 
+                        position: 'fixed',
+                        bottom: '30px',
+                        right: '25px',
+                        backgroundColor: '#20b494',
+                        '&:hover': {
+                            backgroundColor: '#189c82',
+                        }
+                    }}
+                >
+                    <AddIcon />
+                </Fab>
+            )}
 
             {openAddStaff && (
                 <AddStaff

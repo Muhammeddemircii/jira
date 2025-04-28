@@ -356,11 +356,11 @@ function StaffTable({ refreshTrigger = 0 }) {
         
         <Divider />
         
-        <Box sx={{ padding: '16px', display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ padding: '16px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
           <FilterListIcon color="action" />
           <Typography variant="subtitle2" fontWeight="600">Filtreler</Typography>
           
-          <FormControl sx={{ minWidth: 220 }}>
+          <FormControl sx={{ minWidth: { xs: '100%', sm: 220 }, mt: { xs: 1, sm: 0 } }}>
             <InputLabel id="departman-label">Departman Seçiniz</InputLabel>
             <Select
               labelId="departman-label"
@@ -424,8 +424,17 @@ function StaffTable({ refreshTrigger = 0 }) {
                     key={`${staff.id}-${index}`}
                     ref={index === deduplicatedStaff.length - 1 ? lastStaffElementRef : undefined}
                   >
-                    <td>{index + 1}</td>
-                    <td>
+                    <td data-label="#" className={index === 0 ? "mobile-card-header" : ""}>
+                      {index + 1}
+                      {index === 0 && (
+                        <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                          <Typography variant="caption" component="span" fontWeight="600">
+                            {staff.name}
+                          </Typography>
+                        </Box>
+                      )}
+                    </td>
+                    <td data-label="Ad">
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Avatar sx={{ width: 32, height: 32, bgcolor: '#20b494' }}>
                           {staff.name ? staff.name.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
@@ -433,12 +442,12 @@ function StaffTable({ refreshTrigger = 0 }) {
                         <Typography variant="body2">{staff.name}</Typography>
                       </Box>
                     </td>
-                    <td>{staff.email}</td>
-                    <td>{staff.bloodType || '-'}</td>
-                    <td>{staff.birthDate || '-'}</td>
-                    <td>{staff.tc || '-'}</td>
-                    <td>{staff.phoneNumber || '-'}</td>
-                    <td>
+                    <td data-label="Email">{staff.email}</td>
+                    <td data-label="Kan Grubu">{staff.bloodType || '-'}</td>
+                    <td data-label="Doğum Tarihi">{staff.birthDate || '-'}</td>
+                    <td data-label="T.C">{staff.tc || '-'}</td>
+                    <td data-label="Tel No">{staff.phoneNumber || '-'}</td>
+                    <td data-label="Departman">
                       <Chip 
                         label={getDepartmentName(staff)} 
                         size="small" 
@@ -450,7 +459,7 @@ function StaffTable({ refreshTrigger = 0 }) {
                         }} 
                       />
                     </td>
-                    <td>
+                    <td data-label="Görev">
                       <Chip 
                         label={staff.roleName || '-'} 
                         size="small" 
@@ -459,7 +468,7 @@ function StaffTable({ refreshTrigger = 0 }) {
                       />
                     </td>
                     {!isPersonnel && (
-                      <td>
+                      <td data-label="İşlemler">
                         <Tooltip title="İşlemler">
                           <IconButton
                             size="small"
