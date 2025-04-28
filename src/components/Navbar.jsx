@@ -85,8 +85,7 @@ function Navbar({ setIsOpen, isOpen }) {
                 "/HomePage", 
                 "/StaffPage", 
                 "/ProfilePage", 
-                "/NotificationsPage", 
-                "/NotificationsSettingsPage",
+                "/NotificationsPage",
                 "/AnnualLeavesPage"
             ];
             
@@ -142,12 +141,6 @@ function Navbar({ setIsOpen, isOpen }) {
     const handleNotifications = () => {
         navigate("/NotificationsPage");
         setActivePage("notifications");
-        if (window.innerWidth < 768) setIsOpen(false);
-    }
-
-    const handleNotificationsSettings = () => {
-        navigate("/NotificationsSettingsPage");
-        setActivePage("notificationsSettings");
         if (window.innerWidth < 768) setIsOpen(false);
     }
 
@@ -508,7 +501,7 @@ function Navbar({ setIsOpen, isOpen }) {
                     )}
                 </AnimatePresence>
 
-                {/* Bildirimler kısmı */}
+
                 <motion.div
                     custom={7}
                     variants={navItemsVariants}
@@ -540,15 +533,7 @@ function Navbar({ setIsOpen, isOpen }) {
                                 exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                <div
-                                    className={`dropdown-item ${activePage === "notifications" ? "active" : ""}`}
-                                    onClick={handleNotifications}
-                                    style={{ display: 'flex', alignItems: 'center' }}
-                                >
-                                    <FontAwesomeIcon icon={faBell} style={{ marginRight: '8px' }} />
-                                    <span>Tüm Bildirimler</span>
-
-                                </div>
+ 
                             </motion.div>
                                 <motion.div
                                     className="tasks-dropdown-content"
@@ -559,7 +544,7 @@ function Navbar({ setIsOpen, isOpen }) {
                                 >
                                     <div
                                         className={`dropdown-item ${activePage === "notifications" ? "active" : ""}`}
-                                        onClick={handleNotificationsSettings}
+                                        onClick={handleNotifications}
                                         style={{ display: 'flex', alignItems: 'center' }}
                                     >
                                         <FontAwesomeIcon icon={faBell} style={{ marginRight: '8px' }} />
