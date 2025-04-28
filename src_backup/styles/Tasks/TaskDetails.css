@@ -1,0 +1,10 @@
+.task-details{
+    background-color:rgb(243,243,244);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 25px;
+    width: 70vh;
+    height: 80vh;
+}

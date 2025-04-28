@@ -1,0 +1,112 @@
+.companies-container {
+  padding: 24px;
+  width: 96%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.companies-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.companies-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.companies-title {
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.companies-table-edit-button {
+  color: #20b494 !important;
+  margin-right: 2px !important;
+  padding: 6px !important;
+  background-color: rgba(32, 180, 148, 0.1) !important;
+}
+
+.companies-table-edit-button:hover {
+  background-color: rgba(32, 180, 148, 0.2) !important;
+}
+
+.companies-table-delete-button {
+  color: #e74c3c !important;
+  margin-right: 2px !important;
+  padding: 6px !important;
+  background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+.companies-table-delete-button:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+.companies-table-users-button {
+  color: #3498db !important;
+  padding: 6px !important;
+  background-color: rgba(52, 152, 219, 0.1) !important;
+}
+
+.companies-table-users-button:hover {
+  background-color: rgba(52, 152, 219, 0.2) !important;
+}
+
+.MuiTableCell-root {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600 !important;
+  color: #555;
+  background-color: #f8f9fa;
+}
+
+.companies-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  width: 100%;
+}
+
+.companies-loading-spinner {
+  width: 60px !important;
+  height: 60px !important;
+  color: #20b494 !important;
+}
+
+.companies-error {
+  padding: 20px;
+  text-align: center;
+  background-color: #fee;
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+/* Mobil görünüm için stil */
+@media (max-width: 768px) {
+  .companies-container {
+    padding: 16px 12px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .companies-header h1 {
+    font-size: 18px;
+  }
+  
+  .MuiTableCell-root {
+    padding: 8px 12px !important;
+  }
+  
+  .companies-title {
+    padding: 12px 16px;
+  }
+} 

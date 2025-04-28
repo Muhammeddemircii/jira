@@ -1,0 +1,185 @@
+/* Modern Login Page Styling */
+.login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 50px;
+    height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.login::before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
+    animation: pulse 15s infinite;
+}
+
+.login > h1 {
+    font-weight: 800;
+    font-size: 120px;
+    color: rgba(42, 100, 196, 0.1);
+    margin-bottom: -10px;
+    letter-spacing: -20px;
+    text-align: center;
+    animation: fall 1.5s ease-out forwards, float 3s ease-in-out infinite alternate;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.login-write {
+    opacity: 1;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-write h3 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.login-write p {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.login-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-bottom: 15px;
+}
+
+.giris-yap {
+    text-align: center;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.giris-yap button {
+    background: linear-gradient(135deg, #3498db, #2980b9) !important;
+    padding: 10px 0 !important;
+    width: 100%;
+    border-radius: 6px !important;
+    text-transform: none !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3) !important;
+}
+
+.giris-yap button:hover {
+    background: linear-gradient(135deg, #2980b9, #3498db) !important;
+    box-shadow: 0 6px 15px rgba(41, 128, 185, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.forgot-password-button {
+    margin-top: 15px;
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+}
+
+.forgot-password-button:hover {
+    color: #2980b9;
+}
+
+.forgot-password-button::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background: #3498db;
+    transition: all 0.3s ease;
+}
+
+.forgot-password-button:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fall {
+    0% {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    100% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Error message styling */
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 10px;
+    animation: shake 0.5s ease-in-out;
+    text-align: center;
+}
+
+@keyframes shake {
+    0%, 100% {transform: translateX(0);}
+    10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
+    20%, 40%, 60%, 80% {transform: translateX(5px);}
+}
+  

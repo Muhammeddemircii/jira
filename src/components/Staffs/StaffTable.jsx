@@ -37,7 +37,6 @@ function StaffTable({ refreshTrigger = 0 }) {
   const [filtered, setFiltered] = useState(false);
   const [isPersonnel, setIsPersonnel] = useState(false);
   
-  // Ref'leri burada tanımla
   const observer = useRef();
   const lastStaffElementRef = useRef();
   const initialFetchDone = useRef(false);
@@ -50,24 +49,19 @@ function StaffTable({ refreshTrigger = 0 }) {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
 
-  // Check user role
   useEffect(() => {
     const userRole = localStorage.getItem("user-role") || "";
     setIsPersonnel(userRole.toLowerCase() === "personel");
   }, []);
 
-  const fetchStaff = useCallback(async (pageNumber, departmentId = '', shouldAppend = false) => {
-    // Aynı departman için gereksiz isteği engelle
+  const fetchStaff = async (pageNumber, departmentId, shouldAppend) => {
     if (!shouldAppend && pageNumber === 1 && departmentId === previousDepartman.current && isApiCalledRef.current) {
-      console.log("Bu departman için zaten API isteği yapıldı, tekrar çağrılmıyor:", departmentId);
       return;
     }
     
-    // Yeni istek için işaretleme
     previousDepartman.current = departmentId;
     isApiCalledRef.current = true;
-    
-    // İstek takibi için özel değişken
+
     let isMounted = true;
     
     try {
@@ -76,18 +70,12 @@ function StaffTable({ refreshTrigger = 0 }) {
       if (departmentId) {
         endpoint += `&DepartmentId=${departmentId}`;
       }
-
-      console.log(`API isteği yapılıyor: ${endpoint}`);
       
       const response = await staffService.getPagedStaff(endpoint);
-      
-      // İstek tamamlandığında bileşen hala var mı kontrol et
+
       if (!isMounted) {
-        console.log("Bileşen unmount oldu, veri güncellenmeyecek");
         return;
       }
-      
-      console.log(`API yanıtı alındı, veri sayısı: ${response?.data?.length || 0}`);
       
       if (response && response.data) {
         const data = response.data;
@@ -102,30 +90,23 @@ function StaffTable({ refreshTrigger = 0 }) {
         setHasMore(pageNumber < totalPages);
       } else {
         dispatch(setError('API yanıtı geçersiz format içeriyor'));
-        console.error("Geçersiz API yanıtı:", response);
       }
     } catch (err) {
       if (!isMounted) return;
       
       dispatch(setError('Personel verileri yüklenirken hata oluştu.'));
-      console.error("Fetch staff error:", err);
     } finally {
       if (isMounted) {
         dispatch(setLoading(false));
       }
     }
     
-    // Temizleme fonksiyonu olarak isMounted değişkenini güncelleme işlevi
     return () => {
       isMounted = false;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]); // dispatch ve staffList bağımlılıklarını kaldır
+  };
 
-  // Yalnızca bileşen mount olduğunda çalışacak - bileşen ilk render olduğunda bir kez çalışır
   useEffect(() => {
-    console.log("StaffTable - Bileşen mount edildi");
-    // Başlangıç durumunu sıfırla
     initialFetchDone.current = false;
     paramProcessed.current = false;
     userInitiated.current = false;
@@ -136,120 +117,90 @@ function StaffTable({ refreshTrigger = 0 }) {
       if (!isComponentMountedRef.current) return;
       
       try {
-        console.log("Departman listesi yükleniyor...");
         const response = await departmentService.getDepartments();
         
         if (!isComponentMountedRef.current) return;
         
         if (!response || !Array.isArray(response)) {
-          console.error("Departman listesi yüklenemedi veya geçersiz format:", response);
           return;
         }
         
-        console.log("Departman listesi yüklendi:", response.length, "departman");
         setDepartmanListesi(response);
         
-        // Departman listesi yüklendikten sonra URL parametrelerini kontrol et
         const searchParams = new URLSearchParams(window.location.search);
         const departmanParam = searchParams.get('departman');
         
         if (departmanParam) {
-          console.log("%c URL'den departman parametresi alındı!", "background: #ff9800; color: white; padding: 3px; border-radius: 3px;", departmanParam);
-          
-          // Gelen departman ID'si geçerli mi kontrol et
           const departmanVarMi = response.find(dept => dept.id === departmanParam);
           
           if (departmanVarMi) {
-            console.log("Departman listesinde eşleşme bulundu:", departmanVarMi.name);
-            // State güncellemelerini tek operasyonda yap ve önceki departmanı kaydet
             previousDepartman.current = departmanParam;
             setDepartman(departmanParam);
             setFiltered(true);
             
-            // Filtrelenmiş veriyi yükle
-            console.log("Departman seçili, filtrelenmiş veriyi yüklüyorum:", departmanParam);
             if (isComponentMountedRef.current) {
               fetchStaff(1, departmanParam, false);
             }
           } else {
-            console.error("URL'den alınan departman ID'si bulunamadı:", departmanParam);
-            // Departman bulunamadı durumunda yükleniyor göstergesi ile tüm verileri getir
             if (isComponentMountedRef.current) {
-              dispatch(setLoading(true)); // Yükleniyor göstergesini aktif et
+              dispatch(setLoading(true));
               fetchStaff(1, '', false);
             }
           }
         } else {
-          console.log("URL'de departman parametresi yok, tüm veriyi getiriyorum");
           if (isComponentMountedRef.current) {
             fetchStaff(1, '', false);
           }
         }
         
-        // Süreç tamamlandı, sadece bir kez çalışması için işaretle
         paramProcessed.current = true;
         initialFetchDone.current = true;
         
       } catch (err) {
-        console.error("Departman verileri yüklenirken hata:", err);
         if (isComponentMountedRef.current) {
           dispatch(setError('Departman verileri yüklenirken hata oluştu.'));
-          // Hata durumunda da veriyi getirmeyi dene
+
           fetchStaff(1, '', false);
           initialFetchDone.current = true;
         }
       }
     };
     
-    // İlk yüklemede departman listesini ve URL parametrelerini işle
     fetchDepartmanVeParams();
     
-    // Temizleme fonksiyonu - bileşen unmount olduğunda çalışır
     return () => {
-      console.log("StaffTable - Bileşen unmount ediliyor");
       isComponentMountedRef.current = false;
       initialFetchDone.current = false;
       paramProcessed.current = false;
       userInitiated.current = false;
       isApiCalledRef.current = false;
     };
-  }, []); // Sadece ilk render'da çalışsın, dispatch ve fetchStaff bağımlılıklarını kaldır
+  }, []);
 
-  // Departman dropdown'ında değişiklik yapıldığında çalışacak 
   const handleDepartmentChange = (e) => {
-    // Kullanıcı tarafından başlatıldığını işaretle
     userInitiated.current = true;
     setDepartman(e.target.value);
   };
   
-  // Sadece departman değiştiğinde ve kullanıcı etkileşimi varsa çalışacak
   useEffect(() => {
-    // İlk render için çalışmayı engelleyelim
     if (!initialFetchDone.current) return;
     
-    // URL parametresi ile gelinmesi durumunda çalışmayı engelleyin
     if (paramProcessed.current && !userInitiated.current) return;
-    
-    // Sadece kullanıcı manual dropdown değişikliği için çalışsın
+   
     if (userInitiated.current) {
-      console.log("Kullanıcı manuel departman değiştirdi, filtreleme yapılıyor:", departman);
       setPage(1);
       setFiltered(!!departman);
       fetchStaff(1, departman, false);
       userInitiated.current = false;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [departman]); // fetchStaff bağımlılığını kaldır
+  }, [departman]);
   
-  // Sadece refreshTrigger değiştiğinde yenileme yap
   useEffect(() => {
     if (refreshTrigger > 0 && initialFetchDone.current) {
-      console.log("RefreshTrigger değişti, veri yenileniyor");
       setPage(1);
       fetchStaff(1, departman, false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger, departman]); // fetchStaff bağımlılığını kaldır
+  }, [refreshTrigger, departman]); 
 
   const loadMoreStaff = useCallback(() => {
     if (!loading && hasMore) {
@@ -257,8 +208,7 @@ function StaffTable({ refreshTrigger = 0 }) {
       setPage(nextPage);
       fetchStaff(nextPage, departman, true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, hasMore, page, departman]); // fetchStaff bağımlılığını kaldır
+  }, [loading, hasMore, page, departman]); 
 
   useEffect(() => {
     if (loading) return;
@@ -295,7 +245,6 @@ function StaffTable({ refreshTrigger = 0 }) {
 
   const deduplicatedStaff = useMemo(() => {
     if (!staffList || !Array.isArray(staffList)) {
-      console.log("Staff list is not an array:", staffList);
       return [];
     }
     
@@ -320,9 +269,7 @@ function StaffTable({ refreshTrigger = 0 }) {
   };
 
   const handleEdit = (staff) => {
-    console.log("Düzenlenecek personel:", staff);
     if (!staff || !staff.id) {
-      console.error("Düzenlenecek personel verisi geçersiz:", staff);
       dispatch(setError("Personel verisi geçersiz"));
       return;
     }
@@ -333,27 +280,19 @@ function StaffTable({ refreshTrigger = 0 }) {
 
   const handlePasswordReset = (staff) => {
     if (!staff || !staff.email) {
-      console.error("Şifre sıfırlanacak personel verisi geçersiz:", staff);
       dispatch(setError("Personel verisi geçersiz"));
       return;
     }
     
     handleMenuClose();
     
-    console.log("Şifre sıfırlama işlemi başlatılıyor - Personel:", staff.name);
-    
-    // Loading state set
     dispatch(setLoading(true));
     
     staffService.resetPassword(staff.email)
       .then((response) => {
-        // Başarılı mesaj göster
-        console.log("Şifre sıfırlama maili gönderildi:", response);
         alert("Şifre sıfırlama maili LED Asistan tarafından gönderildi.");
       })
       .catch(error => {
-        console.error("Şifre sıfırlama hatası:", error);
-        // Hata detaylarını göster
         const errorMessage = error.response?.data?.message || 
                            error.response?.data?.errors?.join(', ') || 
                            "Şifre sıfırlama işlemi sırasında bir hata oluştu.";
@@ -370,23 +309,17 @@ function StaffTable({ refreshTrigger = 0 }) {
     
     handleMenuClose();
     
-    console.log("Silinecek ID:", userId);
-    
     staffService.deleteUser(userId, exitReason)
       .then(() => {
-        console.log("Personel başarıyla silindi.");
         dispatch(setStaffList(staffList.filter(item => item.id !== userId)));
       })
       .catch(error => {
-        console.error("Silme işlemi başarısız:", error);
       });
   };
 
   useEffect(() => {
-    console.log("Staff List:", staffList);
   }, [staffList]);
 
-  // Boş liste mesajını düzenleyelim
   const getEmptyMessage = () => {
     if (filtered && departman) {
       const selectedDept = departmanListesi.find(dept => dept.id === departman);
@@ -397,7 +330,6 @@ function StaffTable({ refreshTrigger = 0 }) {
     return "Görüntülenecek personel bulunamadı.";
   };
 
-  // Başlık metni için fonksiyon
   const getTableTitle = () => {
     if (filtered && departman) {
       const selectedDept = departmanListesi.find(dept => dept.id === departman);

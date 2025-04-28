@@ -1,0 +1,18 @@
+body{
+  background-color:rgb(243,243,244);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+.task-details-overlay {
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; 
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+}
